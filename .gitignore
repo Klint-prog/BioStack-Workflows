@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+.python-version
+.venv/
+venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
+docker-compose.override.yml
+*.log
+
+# Nextflow
+.nextflow/
+.nextflow.log*
+work/
+results/
+timeline.html
+trace.txt
+report.html
+dag.dot
+.nextflow.cache/
+
+# BioStack runtime outputs
+biostack-runs/
+outputs/
+reports/
+checksums/
+
+# SQLite/local databases
+*.sqlite
+*.sqlite3
+*.db
