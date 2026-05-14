@@ -53,6 +53,39 @@ O MVP deve entregar uma CLI capaz de:
 5. Registrar versões, parâmetros, logs e checksums.
 6. Gerar relatório HTML e JSON.
 
+## Instalação local para desenvolvimento
+
+Pré-requisitos mínimos:
+
+- Python 3.11 ou superior.
+- `pip` atualizado.
+
+Instalação em modo editável:
+
+```bash
+python -m pip install -e .
+```
+
+Com dependências de desenvolvimento:
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+Comandos iniciais da CLI:
+
+```bash
+biostack --help
+biostack version
+biostack doctor
+```
+
+Executar testes:
+
+```bash
+pytest -q
+```
+
 ## Fora do escopo inicial
 
 Para manter o MVP realista, o projeto não deve iniciar com:
@@ -66,7 +99,7 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 
 ## Estado atual
 
-Este repositório está na fase 00: fundação estratégica e repositório base. Ainda não há código Python implementado.
+Este repositório está na fase 01: pacote Python instalável com CLI mínima `biostack`, comandos `version` e `doctor`, testes unitários e CI básico via GitHub Actions.
 
 ## Licença
 
