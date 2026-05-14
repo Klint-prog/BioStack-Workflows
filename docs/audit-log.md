@@ -9,3 +9,11 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: manter o MVP restrito a CLI, Nextflow, Docker e relatórios reprodutíveis.
 - Decisão: usar Apache-2.0 como licença inicial.
 - Observação: banco de dados não será usado no MVP inicial salvo necessidade técnica posterior.
+
+## phase_01 — Pacote Python e CLI mínima
+
+- Decisão: criar pacote Python instalável via `pyproject.toml` usando Setuptools como backend de build para maximizar compatibilidade em CI e ambientes locais.
+- Decisão: centralizar a versão em `biostack/__init__.py` e expor `biostack version` via Typer.
+- Decisão: implementar `biostack doctor` como diagnóstico tolerante, sem falhar quando Docker ou Nextflow não estão instalados.
+- Decisão: manter a detecção de ambiente em `biostack/core/system.py` para separar CLI de lógica de sistema.
+- Decisão: adicionar CI mínimo com GitHub Actions executando `pytest -q` em Python 3.11.
