@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "biostack-workflows"
+version = "0.1.0"
+description = "CLI open source para montar, validar e auditar workflows de bioinformática reprodutíveis."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "BioStack Workflows Contributors" }
+]
+keywords = ["bioinformatics", "workflows", "nextflow", "docker", "reproducibility"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = [
+  "typer>=0.12,<1.0",
+  "rich>=13.7,<14.0",
+  "pydantic>=2.7,<3.0",
+  "jinja2>=3.1,<4.0",
+  "pyyaml>=6.0,<7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2,<9.0",
+]
+
+[project.scripts]
+biostack = "biostack.main:app"
+
+[project.urls]
+Homepage = "https://github.com/Klint-prog/BioStack-Workflows"
+Repository = "https://github.com/Klint-prog/BioStack-Workflows"
+Issues = "https://github.com/Klint-prog/BioStack-Workflows/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.setuptools.packages.find]
+include = ["biostack*"]
