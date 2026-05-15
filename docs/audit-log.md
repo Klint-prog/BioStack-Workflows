@@ -79,3 +79,12 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: manter a configuração de provider real por variável de ambiente `BIOSTACK_LLM_API_KEY`, sem gravar chaves no repositório.
 - Decisão: limitar logs enviados ao prompt aos últimos 12.000 caracteres, preservando simplicidade e reduzindo risco de prompts excessivos no MVP.
 - Observação: o provider real `env` valida a presença de chave, mas a chamada externa concreta permanece fora do MVP inicial; o projeto segue funcional sem IA.
+
+## phase_09 — Docker base e Compose
+
+- Decisão: criar a primeira base Docker da v0.2.0 como container de backend/CLI, sem API nova, banco, fila, worker, frontend ou reverse proxy.
+- Decisão: usar `python:3.11-slim` e instalar o pacote em modo editável com extras `[web,dev]` para manter compatibilidade com os testes e com o painel local já existente.
+- Decisão: montar o volume nomeado `biostack_data` em `/workspace`, preservando projetos, logs e relatórios gerados dentro do container.
+- Decisão: manter o serviço Compose com o nome `backend`, alinhado aos comandos mínimos da fase (`docker compose run --rm backend ...`).
+- Decisão: adicionar `.env.example` sem segredos reais e `.dockerignore` para reduzir contexto de build e evitar envio acidental de ambientes locais.
+- Observação: Postgres, Redis, worker, API FastAPI versionada, frontend React e Nginx permanecem explicitamente fora desta fase.

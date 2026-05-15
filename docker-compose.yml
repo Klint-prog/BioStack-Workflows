@@ -1,0 +1,16 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    image: biostack-workflows-backend:phase-09
+    env_file:
+      - .env.example
+    environment:
+      BIOSTACK_WORKSPACE: /workspace
+    volumes:
+      - biostack_data:/workspace
+    working_dir: /workspace
+
+volumes:
+  biostack_data:
