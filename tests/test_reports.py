@@ -8,7 +8,11 @@ from biostack.core.metadata import RunMetadata, collect_tool_versions, utc_now
 from biostack.core.project import create_project
 from biostack.core.runner import run_workflow
 from biostack.main import app
-from biostack.reports.generator import generate_reports, regenerate_html_for_run, resolve_report_json
+from biostack.reports.generator import (
+    generate_reports,
+    regenerate_html_for_run,
+    resolve_report_json,
+)
 
 runner = CliRunner()
 
@@ -54,7 +58,10 @@ def test_report_latest_resolves_deterministically_and_regenerates_html(tmp_path:
     assert html_path.is_file()
 
 
-def test_run_dry_run_generates_metadata_reports_and_report_command(tmp_path: Path, monkeypatch) -> None:
+def test_run_dry_run_generates_metadata_reports_and_report_command(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
     create_project("demo", base_dir=tmp_path)
     project_dir = tmp_path / "demo"
     (project_dir / "data" / "raw" / "sample.fastq").write_text("ACGT", encoding="utf-8")
@@ -68,7 +75,9 @@ def test_run_dry_run_generates_metadata_reports_and_report_command(tmp_path: Pat
     reports = sorted((project_dir / "reports").glob("run-*.*"))
     assert any(path.suffix == ".json" for path in reports)
     assert any(path.suffix == ".html" for path in reports)
-    json_text = next(path for path in reports if path.suffix == ".json").read_text(encoding="utf-8")
+    json_text = next(path for path in reports if path.suffix == ".json").read_text(
+        encoding="utf-8"
+    )
     assert '"status": "SUCCEEDED"' in json_text
     assert '"sha256"' in json_text
 

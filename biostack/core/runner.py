@@ -9,7 +9,13 @@ from pathlib import Path
 
 from biostack.core.checksums import collect_input_checksums
 from biostack.core.config import BioStackConfig, load_project_config
-from biostack.core.metadata import RunMetadata, collect_tool_versions, finalize_metadata, generate_run_id, utc_now
+from biostack.core.metadata import (
+    RunMetadata,
+    collect_tool_versions,
+    finalize_metadata,
+    generate_run_id,
+    utc_now,
+)
 from biostack.reports.generator import generate_reports
 
 
@@ -31,7 +37,7 @@ class NextflowNotAvailableError(RunnerError):
 
 @dataclass(frozen=True)
 class RunResult:
-    """Structured result returned by the BioStack workflow runner."""
+    """Structured result returned after running or simulating a workflow."""
 
     run_id: str
     command: list[str]
@@ -78,7 +84,13 @@ def resolve_workflow_path(project_dir: Path, workflow_name: str, storage_workflo
     )
 
 
-def build_nextflow_command(*, workflow_path: Path, profile: str, project_dir: Path, run_id: str) -> list[str]:
+def build_nextflow_command(
+    *,
+    workflow_path: Path,
+    profile: str,
+    project_dir: Path,
+    run_id: str,
+) -> list[str]:
     """Build a Nextflow command using an argument list instead of shell interpolation."""
     return [
         "nextflow",
@@ -95,24 +107,43 @@ def build_nextflow_command(*, workflow_path: Path, profile: str, project_dir: Pa
     ]
 
 
-def _write_log_header(log_path: Path, config: BioStackConfig, command_text: str, run_id: str, workflow: str, profile: str, dry_run: bool) -> None:
+def _write_log_header(
+    log_path: Path,
+    config: BioStackConfig,
+    command_text: str,
+    run_id: str,
+    workflow: str,
+    profile: str,
+    dry_run: bool,
+) -> None:
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_path.write_text(
-        "\n".join([
-            "BioStack workflow run",
-            f"run_id={run_id}",
-            f"project={config.project.name}",
-            f"workflow={workflow}",
-            f"profile={profile}",
-            f"dry_run={dry_run}",
-            f"command={command_text}",
-            "",
-        ]),
+        "\n".join(
+            [
+                "BioStack workflow run",
+                f"run_id={run_id}",
+                f"project={config.project.name}",
+                f"workflow={workflow}",
+                f"profile={profile}",
+                f"dry_run={dry_run}",
+                f"command={command_text}",
+                "",
+            ]
+        ),
         encoding="utf-8",
     )
 
 
-def _initial_metadata(*, run_id: str, command: list[str], workflow: str, profile: str, dry_run: bool, project_dir: Path, log_path: Path) -> RunMetadata:
+def _initial_metadata(
+    *,
+    run_id: str,
+    command: list[str],
+    workflow: str,
+    profile: str,
+    dry_run: bool,
+    project_dir: Path,
+    log_path: Path,
+) -> RunMetadata:
     input_dir = project_dir / "data" / "raw"
     return RunMetadata(
         run_id=run_id,
@@ -133,7 +164,16 @@ def _initial_metadata(*, run_id: str, command: list[str], workflow: str, profile
     )
 
 
-def _write_reports(metadata: RunMetadata, *, project_dir: Path, reports_dir: str, status: str, return_code: int | None = None, log_path: Path | None = None, error: str | None = None) -> tuple[Path, Path]:
+def _write_reports(
+    metadata: RunMetadata,
+    *,
+    project_dir: Path,
+    reports_dir: str,
+    status: str,
+    return_code: int | None = None,
+    log_path: Path | None = None,
+    error: str | None = None,
+) -> tuple[Path, Path]:
     finalized = finalize_metadata(
         metadata,
         status=status,  # type: ignore[arg-type]
@@ -144,14 +184,24 @@ def _write_reports(metadata: RunMetadata, *, project_dir: Path, reports_dir: str
     return generate_reports(finalized, project_dir=project_dir, reports_dir=reports_dir)
 
 
-def run_workflow(*, project_dir: Path | None = None, workflow: str | None = None, profile: str | None = None, dry_run: bool = False) -> RunResult:
+def run_workflow(
+    *,
+    project_dir: Path | None = None,
+    workflow: str | None = None,
+    profile: str | None = None,
+    dry_run: bool = False,
+) -> RunResult:
     """Build and optionally execute a configured Nextflow workflow."""
     resolved_project_dir = (project_dir or Path.cwd()).resolve()
     config = load_project_config(find_project_config(resolved_project_dir))
     workflow_name = workflow or config.workflow.name
     selected_profile = profile or config.workflow.profile
     run_id = generate_run_id()
-    workflow_path = resolve_workflow_path(resolved_project_dir, workflow_name, config.storage.workflows)
+    workflow_path = resolve_workflow_path(
+        resolved_project_dir,
+        workflow_name,
+        config.storage.workflows,
+    )
     command = build_nextflow_command(
         workflow_path=workflow_path,
         profile=selected_profile,
@@ -160,7 +210,15 @@ def run_workflow(*, project_dir: Path | None = None, workflow: str | None = None
     )
     log_path = resolved_project_dir / config.storage.logs / f"{run_id}.log"
     command_text = shlex.join(command)
-    _write_log_header(log_path, config, command_text, run_id, workflow_name, selected_profile, dry_run)
+    _write_log_header(
+        log_path,
+        config,
+        command_text,
+        run_id,
+        workflow_name,
+        selected_profile,
+        dry_run,
+    )
     metadata = _initial_metadata(
         run_id=run_id,
         command=command,
@@ -179,10 +237,26 @@ def run_workflow(*, project_dir: Path | None = None, workflow: str | None = None
             status="SUCCEEDED",
             log_path=log_path,
         )
-        return RunResult(run_id, command, log_path, resolved_project_dir, workflow_name, selected_profile, dry_run, json_path, html_path)
+        return RunResult(
+            run_id,
+            command,
+            log_path,
+            resolved_project_dir,
+            workflow_name,
+            selected_profile,
+            dry_run,
+            json_path,
+            html_path,
+        )
 
     try:
-        completed = subprocess.run(command, cwd=resolved_project_dir, check=False, capture_output=True, text=True)
+        completed = subprocess.run(
+            command,
+            cwd=resolved_project_dir,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
     except FileNotFoundError as exc:
         with log_path.open("a", encoding="utf-8") as log_file:
             log_file.write("Erro: Nextflow não encontrado no PATH.\n")
@@ -208,6 +282,10 @@ def run_workflow(*, project_dir: Path | None = None, workflow: str | None = None
         log_file.write(f"\nreturn_code={completed.returncode}\n")
 
     status = "SUCCEEDED" if completed.returncode == 0 else "FAILED"
+    error = None
+    if completed.returncode != 0:
+        error = f"Nextflow retornou código {completed.returncode}."
+
     json_path, html_path = _write_reports(
         metadata,
         project_dir=resolved_project_dir,
@@ -215,11 +293,12 @@ def run_workflow(*, project_dir: Path | None = None, workflow: str | None = None
         status=status,
         return_code=completed.returncode,
         log_path=log_path,
-        error=None if completed.returncode == 0 else f"Nextflow retornou código {completed.returncode}.",
+        error=error,
     )
     if completed.returncode != 0:
         raise RunnerError(
-            f"Nextflow retornou código {completed.returncode}. Consulte o log em {log_path}. Relatório gerado em {json_path}."
+            f"Nextflow retornou código {completed.returncode}. Consulte o log em "
+            f"{log_path}. Relatório gerado em {json_path}."
         )
 
     return RunResult(
