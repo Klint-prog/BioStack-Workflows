@@ -8,14 +8,15 @@ from typing import Any, Literal
 import yaml
 from pydantic import BaseModel, Field, field_validator
 
-SUPPORTED_TEMPLATES = {"rnaseq-basic"}
+TemplateName = Literal["rnaseq-basic", "variant-calling-basic"]
+SUPPORTED_TEMPLATES: set[str] = {"rnaseq-basic", "variant-calling-basic"}
 
 
 class ProjectMetadata(BaseModel):
     """Project-level metadata stored in biostack.yml."""
 
     name: str = Field(min_length=1)
-    template: Literal["rnaseq-basic"]
+    template: TemplateName
     description: str = Field(min_length=1)
 
     @field_validator("name")
@@ -31,7 +32,7 @@ class ProjectMetadata(BaseModel):
 class WorkflowConfig(BaseModel):
     """Workflow identity and engine configuration."""
 
-    name: Literal["rnaseq-basic"]
+    name: TemplateName
     engine: Literal["nextflow"] = "nextflow"
     profile: str = Field(default="docker", min_length=1)
 
