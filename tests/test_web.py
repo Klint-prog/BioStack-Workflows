@@ -1,5 +1,8 @@
 from pathlib import Path
 
+import pytest
+
+fastapi = pytest.importorskip("fastapi")
 from fastapi.testclient import TestClient
 
 from biostack.core.project import create_project
