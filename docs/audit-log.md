@@ -34,3 +34,12 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: resolver workflows primeiro em `workflows/<nome>` dentro do projeto e depois em `workflows/<nome>` do repositório/pacote em modo editável.
 - Decisão: criar `rnaseq-basic` como pipeline demonstrativo com `FASTQC_DEMO` usando `echo`, documentando explicitamente que ainda não é análise científica validada.
 - Decisão: tratar ausência de Nextflow com mensagem amigável e sem traceback bruto para o usuário final.
+
+## phase_04 — Rastreabilidade, metadados e relatórios
+
+- Decisão: mover a geração de `run_id` para `biostack/core/metadata.py`, mantendo o formato ordenável com timestamp UTC e sufixo aleatório.
+- Decisão: cada execução com projeto carregado gera JSON e HTML em `reports/<run_id>.*`, inclusive `--dry-run`, ausência de Nextflow e retorno Nextflow diferente de zero.
+- Decisão: preservar logs consolidados no JSON para auditoria, mantendo o arquivo original em `logs/<run_id>.log` como evidência operacional.
+- Decisão: calcular checksums SHA256 por streaming e limitar a coleta inicial aos arquivos de entrada compatíveis em `data/raw/` para evitar varreduras amplas no MVP.
+- Decisão: resolver `biostack report --run latest` de forma determinística lendo `started_at` dos JSONs e usando o nome do arquivo como desempate.
+- Observação: erros antes de identificar um projeto BioStack válido, como ausência de `biostack.yml`, não geram relatório porque ainda não há configuração confiável de armazenamento.

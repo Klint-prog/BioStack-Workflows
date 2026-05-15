@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>BioStack Run Report - {{ metadata.run_id }}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; line-height: 1.5; color: #17202a; }
+    h1, h2 { color: #0b3d2e; }
+    code, pre { background: #f4f6f7; border-radius: 4px; }
+    code { padding: 0.1rem 0.25rem; }
+    pre { padding: 1rem; overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 1.5rem; }
+    th, td { border: 1px solid #d5dbdb; padding: 0.5rem; text-align: left; vertical-align: top; }
+    th { background: #eaf2f8; }
+    .status-SUCCEEDED { color: #117a37; font-weight: bold; }
+    .status-FAILED { color: #b03a2e; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>BioStack Run Report</h1>
+  <p><strong>Run ID:</strong> <code>{{ metadata.run_id }}</code></p>
+  <p><strong>Status:</strong> <span class="status-{{ metadata.status }}">{{ metadata.status }}</span></p>
+  <p><strong>Workflow:</strong> {{ metadata.workflow }} | <strong>Profile:</strong> {{ metadata.profile }} | <strong>Dry-run:</strong> {{ metadata.dry_run }}</p>
+  <p><strong>Início:</strong> {{ metadata.started_at }}<br><strong>Fim:</strong> {{ metadata.finished_at }}<br><strong>Duração:</strong> {{ metadata.duration_seconds }}s</p>
+
+  <h2>Comando</h2>
+  <pre>{{ command_text }}</pre>
+
+  <h2>Parâmetros</h2>
+  <table><tbody>{% for key, value in metadata.parameters.items() %}<tr><th>{{ key }}</th><td>{{ value }}</td></tr>{% endfor %}</tbody></table>
+
+  <h2>Versões</h2>
+  <table><tbody>
+    {% for key, value in metadata.versions.model_dump().items() %}<tr><th>{{ key }}</th><td>{{ value or 'não disponível' }}</td></tr>{% endfor %}
+  </tbody></table>
+
+  <h2>Checksums SHA256 dos inputs</h2>
+  {% if metadata.input_checksums %}
+  <table><thead><tr><th>Arquivo</th><th>SHA256</th><th>Tamanho</th></tr></thead><tbody>
+  {% for item in metadata.input_checksums %}<tr><td>{{ item.path }}</td><td><code>{{ item.sha256 }}</code></td><td>{{ item.size_bytes }}</td></tr>{% endfor %}
+  </tbody></table>
+  {% else %}<p>Nenhum arquivo de entrada compatível foi encontrado.</p>{% endif %}
+
+  <h2>Logs consolidados</h2>
+  <p><strong>Arquivo:</strong> <code>{{ metadata.log_path or 'não registrado' }}</code></p>
+  <pre>{{ metadata.log_text }}</pre>
+
+  {% if metadata.error %}<h2>Erro</h2><pre>{{ metadata.error }}</pre>{% endif %}
+</body>
+</html>
