@@ -6,16 +6,45 @@ O formato segue uma organização simples por versão, com foco em rastreabilida
 
 ## Não lançado
 
-### Adicionado
-
-- Workflow demonstrativo `variant-calling-basic` com `main.nf`, `nextflow.config` e documentação própria.
-- Suporte ao template `variant-calling-basic` em `biostack init` e na validação Pydantic de `biostack.yml`.
-- Testes cobrindo a criação de projetos com `rnaseq-basic` e `variant-calling-basic`.
-- Documentação de workflows atualizada com limites científicos e clínicos do variant calling demonstrativo.
-
 ### Observações
 
-- `variant-calling-basic` é demonstrativo e não deve ser usado como pipeline clínico, diagnóstico ou científico validado.
+- Sem mudanças pendentes após a preparação do release v0.2.0 nesta fase.
+
+## v0.2.0 — Docker Platform Edition
+
+### Adicionado
+
+- Docker Platform Edition com backend/CLI, API FastAPI versionada, PostgreSQL 16, Redis 7, worker assíncrono, frontend React/Vite e reverse proxy Nginx.
+- Fluxo end-to-end obrigatório: criar projeto, executar dry-run, gerar relatório, visualizar no painel e explicar logs com IA mock.
+- Persistência relacional de projetos, runs, eventos e arquivos usando SQLAlchemy, Psycopg e Alembic.
+- Fila Redis simples para execução assíncrona por worker.
+- Script `scripts/e2e-smoke.sh` para validação HTTP via Nginx.
+- Healthchecks para serviços principais.
+- Logging consistente para API e worker via `BIOSTACK_LOG_LEVEL`.
+- CORS configurável via `BIOSTACK_CORS_ORIGINS`.
+- Documentação de segurança operacional, performance, backup/restore e troubleshooting Docker.
+
+### Alterado
+
+- README atualizado para apresentar a v0.2.0 Docker Platform Edition.
+- `docker-compose.yml` usa imagens marcadas como `v0.2.0`, restart policies, rotação básica de logs, `no-new-privileges` e portas parametrizadas.
+- Containers Python `backend`, `api` e `worker` executam como usuário não-root `biostack`.
+- Frontend Docker usa `npm ci` para build reprodutível baseado no lockfile.
+- CI passa a validar também o build do frontend.
+
+### Segurança
+
+- O Docker socket não é montado por padrão.
+- `.env.example` continua sem segredos reais.
+- IA permanece restrita a troubleshooting operacional e provider mock por padrão.
+- O aviso `AVISO: Não usar para diagnóstico ou interpretação clínica.` permanece obrigatório.
+
+### Limitações conhecidas
+
+- Plataforma local-first, sem autenticação robusta de produção.
+- Sem Kubernetes, HPC/SLURM, Apptainer, RBAC ou multiusuário avançado.
+- Sem interpretação biológica ou clínica por IA.
+- Execução simultânea complexa de muitos workflows permanece fora do escopo.
 
 ## v0.1.0 — Release público inicial
 
@@ -40,5 +69,5 @@ O formato segue uma organização simples por versão, com foco em rastreabilida
 ### Limitações conhecidas
 
 - O workflow `rnaseq-basic` é demonstrativo e não deve ser tratado como análise científica validada.
-- O MVP é local-first e não inclui painel web, Kubernetes, HPC/SLURM, multiusuário ou interpretação biológica por IA.
+- O MVP é local-first e não inclui painel web complexo, Kubernetes, HPC/SLURM, multiusuário ou interpretação biológica por IA.
 - A execução real depende de Nextflow e, no profile `docker`, Docker instalados no ambiente do usuário.
