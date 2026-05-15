@@ -40,6 +40,8 @@ def run_project_command(
     console.print(f"Workflow: {result.workflow_name}")
     console.print(f"Profile: {result.profile}")
     console.print(f"Log: {result.log_path}")
+    console.print(f"Report JSON: {result.report_json_path}")
+    console.print(f"Report HTML: {result.report_html_path}")
 
     if dry_run:
         console.print("[yellow]Dry-run:[/yellow] comando Nextflow não executado.")
