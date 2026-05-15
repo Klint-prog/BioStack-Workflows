@@ -15,12 +15,13 @@ O projeto começa pequeno: uma CLI em Python capaz de preparar um projeto BioSta
 
 O release público v0.1.0 consolida o MVP local-first:
 
-- CLI instalável com `biostack --help`, `biostack version`, `biostack doctor`, `biostack init`, `biostack run` e `biostack report`.
-- Template inicial `rnaseq-basic` para criar uma estrutura auditável de projeto.
+- CLI instalável com `biostack --help`, `biostack version`, `biostack doctor`, `biostack init`, `biostack run`, `biostack report` e `biostack web`.
+- Templates `rnaseq-basic` e `variant-calling-basic` para criar estruturas auditáveis de projeto.
 - Execução real ou simulada via Nextflow, com `--dry-run` para ambientes sem Nextflow.
 - Relatórios HTML e JSON com metadados, versões, parâmetros, logs e checksums SHA256 dos inputs.
+- Painel web local experimental e opcional para visualizar projetos, execuções e relatórios sem substituir a CLI.
 - CI com testes automatizados e lint usando Ruff.
-- Documentação de instalação, demo e relatórios.
+- Documentação de instalação, demo, relatórios e painel web local.
 
 ## Problema
 
@@ -40,10 +41,11 @@ BioStack Workflows organiza a execução de pipelines usando uma combinação de
 - Typer para comandos de terminal claros.
 - Pydantic para validação de configurações e metadados.
 - Rich para saída legível no terminal.
-- Jinja2 para geração de relatórios.
+- Jinja2 para geração de relatórios e templates simples.
 - PyYAML para configuração declarativa.
 - Nextflow como motor de workflow científico.
 - Docker e Docker Compose para reprodutibilidade de ambiente.
+- FastAPI e Uvicorn como dependências opcionais do painel web local.
 - Relatórios HTML e JSON com metadados, versões, parâmetros, logs e checksums.
 
 ## Instalação
@@ -70,6 +72,18 @@ Com dependências de desenvolvimento:
 python -m pip install -e ".[dev]"
 ```
 
+Com dependências opcionais do painel web local:
+
+```bash
+python -m pip install -e ".[web]"
+```
+
+Com desenvolvimento e painel web:
+
+```bash
+python -m pip install -e ".[web,dev]"
+```
+
 Consulte [docs/installation.md](docs/installation.md) para detalhes e solução de problemas.
 
 ## Quickstart
@@ -90,6 +104,19 @@ Para executar o workflow real, instale Nextflow e Docker e rode:
 ```bash
 biostack run --workflow rnaseq-basic --profile docker
 ```
+
+## Painel web local experimental
+
+O painel web é opcional, experimental, local e sem autenticação. Ele serve para revisar projetos e relatórios já gerados pela CLI, não para substituir o fluxo de terminal.
+
+```bash
+python -m pip install -e ".[web]"
+biostack web --host 127.0.0.1 --port 8000
+```
+
+Depois acesse `http://127.0.0.1:8000/` em um navegador local. Não exponha esse servidor em redes públicas.
+
+Leia mais em [docs/web-ui.md](docs/web-ui.md).
 
 ## Demo
 
@@ -122,10 +149,11 @@ O MVP entrega uma CLI capaz de:
 
 1. Criar a estrutura de um projeto BioStack.
 2. Validar se o ambiente possui dependências essenciais.
-3. Executar ou simular um workflow RNA-seq básico via Nextflow.
+3. Executar ou simular workflows básicos via Nextflow.
 4. Capturar metadados de execução.
 5. Registrar versões, parâmetros, logs e checksums.
 6. Gerar relatório HTML e JSON.
+7. Visualizar projetos e relatórios em painel web local opcional.
 
 ## Roadmap
 
@@ -150,12 +178,13 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 - [Instalação](docs/installation.md)
 - [Demo do MVP](docs/demo.md)
 - [Relatórios](docs/reports.md)
+- [Painel web local](docs/web-ui.md)
 - [Audit log](docs/audit-log.md)
 - [Changelog](CHANGELOG.md)
 
 ## Estado atual
 
-Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo.
+Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, painel web local opcional, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo.
 
 ## Licença
 

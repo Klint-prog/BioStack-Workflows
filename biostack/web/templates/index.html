@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>BioStack Local Web UI</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; line-height: 1.5; color: #17202a; }
+    h1, h2 { color: #0b3d2e; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 2rem; }
+    th, td { border: 1px solid #d5dbdb; padding: 0.5rem; text-align: left; vertical-align: top; }
+    th { background: #eaf2f8; }
+    code { background: #f4f6f7; padding: 0.1rem 0.25rem; border-radius: 4px; }
+    nav a { margin-right: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>BioStack Workflows — painel local</h1>
+  <p>Interface experimental e local para visualizar projetos, execuções e relatórios. A CLI continua sendo a interface principal.</p>
+  <nav><a href="/">Início</a><a href="/projects">Projetos</a><a href="/reports">Relatórios</a></nav>
+
+  <h2>Projetos encontrados</h2>
+  {% if projects %}
+  <table>
+    <thead><tr><th>Projeto</th><th>Template</th><th>Workflow</th><th>Relatórios</th><th>Caminho</th></tr></thead>
+    <tbody>
+      {% for project in projects %}
+      <tr>
+        <td>{{ project.name }}</td>
+        <td><code>{{ project.template }}</code></td>
+        <td><code>{{ project.workflow }}</code></td>
+        <td>{{ project.reports_count }}</td>
+        <td><code>{{ project.path }}</code></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Nenhum projeto BioStack encontrado no diretório atual ou em seus subdiretórios imediatos.</p>
+  {% endif %}
+
+  <h2>Execuções recentes</h2>
+  {% if reports %}
+  <table>
+    <thead><tr><th>Run ID</th><th>Projeto</th><th>Status</th><th>Workflow</th><th>Início</th></tr></thead>
+    <tbody>
+      {% for report in reports %}
+      <tr>
+        <td><a href="/reports/{{ report.run_id }}"><code>{{ report.run_id }}</code></a></td>
+        <td>{{ report.project_name }}</td>
+        <td>{{ report.status }}</td>
+        <td><code>{{ report.workflow }}</code></td>
+        <td>{{ report.started_at }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Nenhuma execução encontrada.</p>
+  {% endif %}
+</body>
+</html>
