@@ -60,7 +60,12 @@ def get_project_by_name(session: Session, name: str) -> Project | None:
 
 def list_runs(session: Session, project_name: str | None = None, limit: int = 100) -> list[Run]:
     """Return persisted runs ordered from newest to oldest."""
-    statement = select(Run).join(Project).order_by(Run.created_at.desc(), Run.run_id.desc()).limit(limit)
+    statement = (
+        select(Run)
+        .join(Project)
+        .order_by(Run.created_at.desc(), Run.run_id.desc())
+        .limit(limit)
+    )
     if project_name:
         statement = statement.where(Project.name == project_name)
     return list(session.scalars(statement))
