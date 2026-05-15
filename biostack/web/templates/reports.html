@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>BioStack Reports</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; line-height: 1.5; color: #17202a; }
+    h1 { color: #0b3d2e; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 2rem; }
+    th, td { border: 1px solid #d5dbdb; padding: 0.5rem; text-align: left; vertical-align: top; }
+    th { background: #eaf2f8; }
+    code { background: #f4f6f7; padding: 0.1rem 0.25rem; border-radius: 4px; }
+    nav a { margin-right: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Relatórios BioStack</h1>
+  <nav><a href="/">Início</a><a href="/projects">Projetos</a><a href="/reports">Relatórios</a></nav>
+  {% if reports %}
+  <table>
+    <thead><tr><th>Run ID</th><th>Projeto</th><th>Status</th><th>Workflow</th><th>Início</th><th>JSON</th></tr></thead>
+    <tbody>
+      {% for report in reports %}
+      <tr>
+        <td><a href="/reports/{{ report.run_id }}"><code>{{ report.run_id }}</code></a></td>
+        <td>{{ report.project_name }}</td>
+        <td>{{ report.status }}</td>
+        <td><code>{{ report.workflow }}</code></td>
+        <td>{{ report.started_at }}</td>
+        <td><code>{{ report.json_path }}</code></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Nenhum relatório encontrado no diretório atual ou em seus subdiretórios imediatos.</p>
+  {% endif %}
+</body>
+</html>
