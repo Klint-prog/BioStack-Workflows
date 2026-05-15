@@ -28,7 +28,7 @@ services:
     build:
       context: .
       dockerfile: docker/backend.Dockerfile
-    image: biostack-workflows-backend:phase-12
+    image: biostack-workflows-backend:phase-13
     env_file:
       - .env.example
     environment:
@@ -48,7 +48,7 @@ services:
     build:
       context: .
       dockerfile: docker/backend.Dockerfile
-    image: biostack-workflows-backend:phase-12
+    image: biostack-workflows-backend:phase-13
     env_file:
       - .env.example
     environment:
@@ -71,7 +71,7 @@ services:
     build:
       context: .
       dockerfile: docker/worker.Dockerfile
-    image: biostack-workflows-worker:phase-12
+    image: biostack-workflows-worker:phase-13
     env_file:
       - .env.example
     environment:
@@ -87,6 +87,16 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    image: biostack-workflows-frontend:phase-13
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
 
 volumes:
   biostack_data:
