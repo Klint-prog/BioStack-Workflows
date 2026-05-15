@@ -27,7 +27,7 @@ docker compose build --no-cache backend worker
 
 ## Build falha no frontend
 
-A imagem usa `npm ci`, então `frontend/package-lock.json` precisa estar versionado e coerente com `package.json`.
+A imagem usa `npm install` para tolerar o lockfile atual do projeto. Se desejar migrar para `npm ci`, atualize antes `frontend/package-lock.json` em sincronia com `package.json`.
 
 ```bash
 cd frontend
@@ -42,8 +42,8 @@ docker compose build frontend
 Teste em camadas:
 
 ```bash
-curl -f http://localhost:8000/api/v1/health
-curl -f http://localhost:8080/api/v1/health
+curl -f http://localhost:8971/api/v1/health
+curl -f http://localhost:8969/api/v1/health
 docker compose logs --no-color api nginx
 ```
 
@@ -91,7 +91,7 @@ docker compose down -v
 Teste a API pela mesma entrada do frontend:
 
 ```bash
-curl -f http://localhost:8080/api/v1/health
+curl -f http://localhost:8969/api/v1/health
 ```
 
 Revise:
@@ -104,6 +104,12 @@ Revise:
 ## Healthcheck falha após mudança de porta
 
 As portas externas são parametrizadas, mas os healthchecks internos usam as portas internas dos containers. Altere `API_PORT`, `FRONTEND_PORT` ou `PLATFORM_PORT` apenas para portas do host.
+
+Portas externas padrão:
+
+- `PLATFORM_PORT=8969`
+- `FRONTEND_PORT=8970`
+- `API_PORT=8971`
 
 ## Permissões no workspace
 
@@ -119,7 +125,7 @@ cd frontend && npm install && npm run build
 cd ..
 docker compose build
 docker compose up -d
-curl -f http://localhost:8080/api/v1/health
+curl -f http://localhost:8969/api/v1/health
 bash scripts/e2e-smoke.sh
 docker compose ps
 docker compose down

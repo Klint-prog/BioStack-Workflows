@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-BASE_URL="${BIOSTACK_E2E_BASE_URL:-http://localhost:8080}"
+BASE_URL="${BIOSTACK_E2E_BASE_URL:-http://localhost:8969}"
 PROJECT_NAME="${BIOSTACK_E2E_PROJECT_NAME:-e2e-smoke}"
 TEMPLATE="${BIOSTACK_E2E_TEMPLATE:-rnaseq-basic}"
 

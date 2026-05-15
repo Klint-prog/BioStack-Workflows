@@ -24,7 +24,7 @@ O release v0.2.0 consolida a Docker Platform Edition:
 - Redis 7 para fila local simples.
 - Worker assíncrono para processamento de runs.
 - Frontend React/Vite separado.
-- Reverse proxy Nginx em `http://localhost:8080`.
+- Reverse proxy Nginx em `http://localhost:8969`.
 - Healthchecks, restart policies, rotação básica de logs e containers Python não-root.
 - IA operacional opcional para troubleshooting técnico de logs e metadados, sem interpretação biológica ou clínica.
 - CI com testes automatizados, lint Ruff e build frontend.
@@ -111,12 +111,18 @@ A v0.2.0 Docker Platform Edition possui backend/CLI em container, API FastAPI ve
 
 ```bash
 docker compose up --build -d
-curl -f http://localhost:8080/api/v1/health
+curl -f http://localhost:8969/api/v1/health
 bash scripts/e2e-smoke.sh
 docker compose down
 ```
 
-Acesse `http://localhost:8080` para criar projeto, executar dry-run, acompanhar runs, abrir relatórios e explicar logs com IA mock.
+Acesse `http://localhost:8969` para criar projeto, executar dry-run, acompanhar runs, abrir relatórios e explicar logs com IA mock.
+
+Portas externas padrão da plataforma Docker:
+
+- `8969`: entrada principal via Nginx.
+- `8970`: frontend direto para debug.
+- `8971`: API direta para debug.
 
 Leia mais em [docs/docker-platform.md](docs/docker-platform.md), [docs/e2e.md](docs/e2e.md), [docs/database.md](docs/database.md) e [docs/api.md](docs/api.md).
 
@@ -139,8 +145,8 @@ A API local-first expõe healthcheck, projetos, runs assíncronos via worker, re
 
 ```bash
 python -m pip install -e ".[web,dev]"
-uvicorn biostack.api.app:app --host 127.0.0.1 --port 8000
-curl -f http://127.0.0.1:8000/api/v1/health
+uvicorn biostack.api.app:app --host 127.0.0.1 --port 8971
+curl -f http://127.0.0.1:8971/api/v1/health
 ```
 
 Leia mais em [docs/api.md](docs/api.md).
@@ -151,10 +157,10 @@ O painel web é opcional, experimental, local e sem autenticação. Ele serve pa
 
 ```bash
 python -m pip install -e ".[web]"
-biostack web --host 127.0.0.1 --port 8000
+biostack web --host 127.0.0.1 --port 8972
 ```
 
-Depois acesse `http://127.0.0.1:8000/` em um navegador local. Não exponha esse servidor em redes públicas.
+Depois acesse `http://127.0.0.1:8972/` em um navegador local. Não exponha esse servidor em redes públicas.
 
 Leia mais em [docs/web-ui.md](docs/web-ui.md).
 
@@ -199,7 +205,7 @@ cd frontend && npm install && npm run build
 cd ..
 docker compose build
 docker compose up -d
-curl -f http://localhost:8080/api/v1/health
+curl -f http://localhost:8969/api/v1/health
 bash scripts/e2e-smoke.sh
 docker compose ps
 docker compose down
