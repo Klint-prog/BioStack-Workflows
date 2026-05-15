@@ -28,9 +28,13 @@ class FakeTroubleshootingProvider(LLMProvider):
         if "failed" in lower_prompt or "erro" in lower_prompt or "error" in lower_prompt:
             findings.append("Há indícios de falha operacional nos logs ou metadados.")
         if "nextflow" in lower_prompt:
-            findings.append("Verifique disponibilidade do Nextflow, profile usado e paths do workflow.")
+            findings.append(
+                "Verifique disponibilidade do Nextflow, profile usado e paths do workflow."
+            )
         if "dry_run=true" in lower_prompt:
-            findings.append("A execução foi simulada; valide o comando antes de rodar em modo real.")
+            findings.append(
+                "A execução foi simulada; valide o comando antes de rodar em modo real."
+            )
         if not findings:
             findings.append("Nenhum erro operacional evidente foi identificado no resumo recebido.")
 
