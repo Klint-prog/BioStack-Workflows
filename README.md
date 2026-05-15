@@ -1,5 +1,8 @@
 # BioStack Workflows
 
+[![CI](https://github.com/Klint-prog/BioStack-Workflows/actions/workflows/ci.yml/badge.svg)](https://github.com/Klint-prog/BioStack-Workflows/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+
 BioStack Workflows é uma infraestrutura open source para criar, executar, documentar e auditar workflows de bioinformática reprodutíveis.
 
 ## Visão
@@ -7,6 +10,17 @@ BioStack Workflows é uma infraestrutura open source para criar, executar, docum
 A visão do projeto é oferecer uma camada simples, auditável e extensível para pesquisadores, estudantes, analistas de bioinformática e equipes técnicas que precisam executar pipelines científicos com rastreabilidade operacional.
 
 O projeto começa pequeno: uma CLI em Python capaz de preparar um projeto BioStack, validar o ambiente, executar workflows com Nextflow e Docker, e gerar relatórios reprodutíveis em HTML e JSON.
+
+## O que existe no v0.1.0
+
+O release público v0.1.0 consolida o MVP local-first:
+
+- CLI instalável com `biostack --help`, `biostack version`, `biostack doctor`, `biostack init`, `biostack run` e `biostack report`.
+- Template inicial `rnaseq-basic` para criar uma estrutura auditável de projeto.
+- Execução real ou simulada via Nextflow, com `--dry-run` para ambientes sem Nextflow.
+- Relatórios HTML e JSON com metadados, versões, parâmetros, logs e checksums SHA256 dos inputs.
+- CI com testes automatizados e lint usando Ruff.
+- Documentação de instalação, demo e relatórios.
 
 ## Problema
 
@@ -32,33 +46,17 @@ BioStack Workflows organiza a execução de pipelines usando uma combinação de
 - Docker e Docker Compose para reprodutibilidade de ambiente.
 - Relatórios HTML e JSON com metadados, versões, parâmetros, logs e checksums.
 
-## Público-alvo
-
-O projeto é pensado inicialmente para:
-
-- Bioinformatas que precisam executar pipelines reprodutíveis.
-- Pesquisadores em ciências da vida que usam workflows computacionais.
-- Estudantes que querem aprender boas práticas de bioinformática operacional.
-- Equipes de infraestrutura científica que precisam padronizar execuções.
-- Projetos open source que desejam documentação e auditoria desde o início.
-
-## Escopo do MVP
-
-O MVP deve entregar uma CLI capaz de:
-
-1. Criar a estrutura de um projeto BioStack.
-2. Validar se o ambiente possui dependências essenciais.
-3. Executar um workflow RNA-seq básico via Nextflow e Docker.
-4. Capturar metadados de execução.
-5. Registrar versões, parâmetros, logs e checksums.
-6. Gerar relatório HTML e JSON.
-
-## Instalação local para desenvolvimento
+## Instalação
 
 Pré-requisitos mínimos:
 
 - Python 3.11 ou superior.
 - `pip` atualizado.
+
+Pré-requisitos para execução real de workflows:
+
+- Nextflow instalado e disponível no `PATH`.
+- Docker instalado quando o profile `docker` for usado.
 
 Instalação em modo editável:
 
@@ -72,45 +70,68 @@ Com dependências de desenvolvimento:
 python -m pip install -e ".[dev]"
 ```
 
-Comandos iniciais da CLI:
+Consulte [docs/installation.md](docs/installation.md) para detalhes e solução de problemas.
+
+## Quickstart
 
 ```bash
 biostack --help
-biostack version
 biostack doctor
-```
-
-Criar o primeiro projeto BioStack:
-
-```bash
 biostack init demo --template rnaseq-basic
 cd demo
-cat biostack.yml
-```
-
-O comando cria uma estrutura local padronizada com `data/raw`, `data/reference`, `workflows`, `results`, `reports`, `logs`, `config`, `biostack.yml` e `README.md`. Por segurança, uma execução repetida recusa sobrescrever o diretório existente; use `--force` apenas quando quiser recriar o projeto.
-
-Simular a execução do workflow RNA-seq básico:
-
-```bash
-cd demo
 biostack run --dry-run
-biostack run --dry-run --workflow rnaseq-basic --profile local
+biostack report --run latest
 ```
 
-Executar o workflow real, quando Nextflow estiver instalado:
+O `--dry-run` mostra o comando Nextflow sem executar e cria evidências auditáveis em `logs/` e `reports/`.
+
+Para executar o workflow real, instale Nextflow e Docker e rode:
 
 ```bash
-biostack run --workflow rnaseq-basic --profile local
+biostack run --workflow rnaseq-basic --profile docker
 ```
 
-O `--dry-run` mostra o comando Nextflow sem executar e cria um log em `logs/<run_id>.log`, útil para auditoria em ambientes onde Nextflow ainda não está instalado.
+## Demo
 
-Executar testes:
+Leia o walkthrough completo em [docs/demo.md](docs/demo.md). Um exemplo autocontido está em [examples/demo-rnaseq](examples/demo-rnaseq).
+
+## Desenvolvimento
 
 ```bash
-pytest -q
+make install
+make test
+make lint
+make demo
 ```
+
+Os mesmos comandos são usados como referência para validar o release público.
+
+## Público-alvo
+
+O projeto é pensado inicialmente para:
+
+- Bioinformatas que precisam executar pipelines reprodutíveis.
+- Pesquisadores em ciências da vida que usam workflows computacionais.
+- Estudantes que querem aprender boas práticas de bioinformática operacional.
+- Equipes de infraestrutura científica que precisam padronizar execuções.
+- Projetos open source que desejam documentação e auditoria desde o início.
+
+## Escopo do MVP
+
+O MVP entrega uma CLI capaz de:
+
+1. Criar a estrutura de um projeto BioStack.
+2. Validar se o ambiente possui dependências essenciais.
+3. Executar ou simular um workflow RNA-seq básico via Nextflow.
+4. Capturar metadados de execução.
+5. Registrar versões, parâmetros, logs e checksums.
+6. Gerar relatório HTML e JSON.
+
+## Roadmap
+
+- v0.1.x: estabilização do MVP, documentação e ajustes de empacotamento.
+- v0.2.0: segundo template/workflow para provar extensibilidade sem duplicação.
+- Futuro: parâmetros mais ricos, exemplos com dados públicos pequenos, integração opcional com armazenamento remoto e melhorias de auditoria.
 
 ## Fora do escopo inicial
 
@@ -123,9 +144,18 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 - Multiusuário.
 - Execução simultânea de muitos workflows.
 
+## Documentação
+
+- [Arquitetura](docs/architecture.md)
+- [Instalação](docs/installation.md)
+- [Demo do MVP](docs/demo.md)
+- [Relatórios](docs/reports.md)
+- [Audit log](docs/audit-log.md)
+- [Changelog](CHANGELOG.md)
+
 ## Estado atual
 
-Este repositório está na fase 03: CLI instalável com `biostack init` e `biostack run`, incluindo workflow demonstrativo `rnaseq-basic` com Nextflow, perfis `local` e `docker`, dry-run auditável e logs por execução.
+Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo.
 
 ## Licença
 
