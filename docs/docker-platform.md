@@ -1,21 +1,34 @@
-# Docker Platform Edition — phase_14
+# Docker Platform Edition — v0.2.0
 
-A phase_14 integra frontend, API, PostgreSQL, Redis, worker, storage compartilhado e reverse proxy Nginx em um fluxo end-to-end executável com `docker compose up --build`.
+A v0.2.0 Docker Platform Edition integra frontend, API, PostgreSQL, Redis, worker, storage compartilhado e reverse proxy Nginx em um fluxo end-to-end executável com `docker compose up --build`.
 
 A plataforma continua local-first, sem autenticação robusta, sem Kubernetes, sem HPC/SLURM, sem orquestração distribuída e sem interpretação biológica por IA. O provider `mock` permanece como caminho seguro para troubleshooting operacional.
 
 ## Serviços disponíveis
 
-O `docker-compose.yml` define seis serviços principais:
+O `docker-compose.yml` define seis serviços principais e um serviço auxiliar de backend/CLI:
 
 - `nginx`: reverse proxy público da plataforma em `http://localhost:8080`, roteando `/` para o frontend e `/api/` para a API.
 - `frontend`: build React/Vite servido por Nginx interno, ainda acessível diretamente em `http://localhost:5173` para debug.
 - `api`: FastAPI versionada em `/api/v1`, com migrations Alembic aplicadas no startup do container.
 - `worker`: consumidor Redis que processa jobs de execução e atualiza runs persistidas.
+- `backend`: container auxiliar para comandos CLI e diagnósticos.
 - `postgres`: PostgreSQL 16 com volume persistente para projetos/runs/eventos.
 - `redis`: Redis 7 com AOF e volume persistente para fila/cache local.
 
 `backend`, `api` e `worker` usam o volume `biostack_workspace` montado em `/workspace`; projetos, logs e relatórios HTML/JSON ficam persistidos nesse volume.
+
+## Hardening aplicado na v0.2.0
+
+- Containers Python executam como usuário não-root `biostack`.
+- Serviços usam `restart: unless-stopped`.
+- Serviços principais têm healthchecks.
+- O Compose aplica `security_opt: no-new-privileges:true`.
+- Logs Docker têm rotação básica com `max-size=10m` e `max-file=3`.
+- Portas são parametrizadas por `.env` local.
+- Redis usa limite básico de memória configurável por `REDIS_MAXMEMORY`.
+- API possui CORS configurável por `BIOSTACK_CORS_ORIGINS`.
+- API e worker usam logging consistente via `BIOSTACK_LOG_LEVEL`.
 
 ## Comando principal
 
@@ -60,10 +73,33 @@ Para resetar dados persistidos durante desenvolvimento local:
 docker compose down -v
 ```
 
+Não execute reset destrutivo antes de consultar [Backup e restore](backup-restore.md).
+
+## Variáveis principais
+
+Veja `.env.example` para valores seguros de exemplo. As principais variáveis operacionais são:
+
+- `BIOSTACK_LOG_LEVEL`
+- `BIOSTACK_CORS_ORIGINS`
+- `BIOSTACK_LLM_PROVIDER`
+- `BIOSTACK_QUEUE_NAME`
+- `REDIS_MAXMEMORY`
+- `API_PORT`
+- `FRONTEND_PORT`
+- `PLATFORM_PORT`
+
+## Documentos operacionais
+
+- [Segurança operacional](security.md)
+- [Performance operacional](performance.md)
+- [Backup e restore](backup-restore.md)
+- [Troubleshooting Docker](troubleshooting-docker.md)
+- [Validação end-to-end](e2e.md)
+
 ## Segurança e limites
 
 - `.env.example` contém apenas valores seguros de exemplo.
 - Não grave chaves reais no repositório.
 - O provider mock é o padrão para explain.
-- A API e o frontend são local-first e não devem ser expostos publicamente sem autenticação, TLS e hardening.
+- A API e o frontend são local-first e não devem ser expostos publicamente sem autenticação, TLS e hardening adicional.
 - O worker não monta `/var/run/docker.sock`; execução real com Nextflow/Docker exigiria revisão de risco antes de habilitar controle do host Docker.
