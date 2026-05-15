@@ -90,6 +90,22 @@ cat biostack.yml
 
 O comando cria uma estrutura local padronizada com `data/raw`, `data/reference`, `workflows`, `results`, `reports`, `logs`, `config`, `biostack.yml` e `README.md`. Por segurança, uma execução repetida recusa sobrescrever o diretório existente; use `--force` apenas quando quiser recriar o projeto.
 
+Simular a execução do workflow RNA-seq básico:
+
+```bash
+cd demo
+biostack run --dry-run
+biostack run --dry-run --workflow rnaseq-basic --profile local
+```
+
+Executar o workflow real, quando Nextflow estiver instalado:
+
+```bash
+biostack run --workflow rnaseq-basic --profile local
+```
+
+O `--dry-run` mostra o comando Nextflow sem executar e cria um log em `logs/<run_id>.log`, útil para auditoria em ambientes onde Nextflow ainda não está instalado.
+
 Executar testes:
 
 ```bash
@@ -109,7 +125,7 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 
 ## Estado atual
 
-Este repositório está na fase 02: CLI instalável com `biostack init` para criação de projetos BioStack reprodutíveis a partir do template inicial `rnaseq-basic`.
+Este repositório está na fase 03: CLI instalável com `biostack init` e `biostack run`, incluindo workflow demonstrativo `rnaseq-basic` com Nextflow, perfis `local` e `docker`, dry-run auditável e logs por execução.
 
 ## Licença
 
