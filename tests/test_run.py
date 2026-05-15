@@ -89,7 +89,8 @@ def test_run_real_execution_uses_subprocess_and_writes_log(tmp_path) -> None:
     with patch("biostack.core.runner.subprocess.run", return_value=completed) as mocked_run:
         result = run_workflow(project_dir=project_dir, workflow="rnaseq-basic", profile="local")
 
-    mocked_run.assert_called_once()
+    nextflow_calls = [call for call in mocked_run.call_args_list if call.args[0][0] == "nextflow"]
+    assert len(nextflow_calls) == 1
     assert result.return_code == 0
     assert result.log_path.is_file()
     log_text = result.log_path.read_text(encoding="utf-8")
