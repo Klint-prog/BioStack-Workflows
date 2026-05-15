@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import sessionmaker
 
 from biostack.api.app import create_app
 from biostack.db.models import Base
@@ -88,7 +87,3 @@ def test_api_minimal_project_run_report_explain_flow(tmp_path, monkeypatch) -> N
     assert explain_payload["run_id"] == run_payload["run_id"]
     assert "Não usar para diagnóstico" in explain_payload["clinical_warning"]
     assert "provider fake" in explain_payload["explanation"]
-
-    session_factory = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
-    with session_factory() as session:
-        Base.metadata.create_all(engine)
