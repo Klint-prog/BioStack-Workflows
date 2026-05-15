@@ -43,3 +43,13 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: calcular checksums SHA256 por streaming e limitar a coleta inicial aos arquivos de entrada compatíveis em `data/raw/` para evitar varreduras amplas no MVP.
 - Decisão: resolver `biostack report --run latest` de forma determinística lendo `started_at` dos JSONs e usando o nome do arquivo como desempate.
 - Observação: erros antes de identificar um projeto BioStack válido, como ausência de `biostack.yml`, não geram relatório porque ainda não há configuração confiável de armazenamento.
+
+## phase_05 — Release público v0.1.0
+
+- Decisão: não adicionar funcionalidades novas nesta fase; a fase consolida instalação, documentação, exemplo público, Makefile, CI e apresentação do MVP.
+- Decisão: manter `version = "0.1.0"` no `pyproject.toml` e `__version__ = "0.1.0"` no pacote para alinhar release e CLI.
+- Decisão: adicionar Ruff ao extra `dev` e ao CI como verificação separada de lint, preservando o job de testes.
+- Decisão: criar o extra `web` vazio como preparação declarativa, sem implementar painel web ou dependências futuras.
+- Decisão: documentar o workflow `rnaseq-basic` como demonstração operacional, não como pipeline científico validado.
+- Decisão: criar `Makefile` com targets mínimos (`install`, `test`, `lint`, `clean`, `demo`) para padronizar revisão humana e CI local.
+- Observação: há conflito textual no JSON da fase: uma tarefa pede criar/enviar tag, mas `github_push_requirement.extra_steps` diz que a IA não cria tags diretamente. Foi adotada a regra mais restritiva: a PR prepara o release e a tag `v0.1.0` fica pendente para o humano após aprovação e merge.
