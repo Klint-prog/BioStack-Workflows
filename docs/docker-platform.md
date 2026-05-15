@@ -1,18 +1,20 @@
-# Docker Platform Edition — phase_11
+# Docker Platform Edition — phase_12
 
-A phase_11 adiciona PostgreSQL 16 e modelos persistentes à API FastAPI versionada criada na phase_10, sem alterar o MVP local-first nem substituir a CLI.
+A phase_12 adiciona Redis 7 e worker assíncrono à Docker Platform Edition, preservando a CLI local-first e a persistência PostgreSQL criada na phase_11.
 
-Esta fase mantém os relatórios, logs e arquivos de projeto no filesystem, mas grava metadados operacionais em banco. Ela não adiciona Redis, fila, worker assíncrono, frontend React ou reverse proxy Nginx. Esses componentes pertencem a fases futuras.
+Esta fase mantém relatórios, logs e arquivos de projeto no filesystem, grava metadados no PostgreSQL e passa a enfileirar execuções criadas pela API. Ela não adiciona frontend React, Nginx, autenticação robusta, Kubernetes ou execução distribuída.
 
 ## Serviços disponíveis
 
-O `docker-compose.yml` define três serviços:
+O `docker-compose.yml` define cinco serviços:
 
 - `postgres`: banco PostgreSQL 16 com healthcheck via `pg_isready`.
+- `redis`: Redis 7 com healthcheck via `redis-cli ping` e persistência AOF simples.
 - `backend`: preserva a CLI `biostack` dentro do container.
 - `api`: inicia `uvicorn biostack.api.app:app` e expõe a API em `http://localhost:8000/api/v1`.
+- `worker`: executa `biostack-worker` e processa jobs de runs vindos do Redis.
 
-`backend` e `api` usam o volume nomeado `biostack_data` montado em `/workspace` para persistir projetos, logs e relatórios. O PostgreSQL usa o volume `biostack_postgres_data`.
+`backend`, `api` e `worker` usam o volume nomeado `biostack_data` montado em `/workspace` para persistir projetos, logs e relatórios. PostgreSQL e Redis usam volumes próprios.
 
 ## Build
 
@@ -20,16 +22,16 @@ O `docker-compose.yml` define três serviços:
 docker compose build
 ```
 
-Ou pelo Makefile:
+Ou pelo Makefile, se disponível:
 
 ```bash
 make docker-build
 ```
 
-## Subir PostgreSQL e aplicar migrations
+## Subir PostgreSQL/Redis e aplicar migrations
 
 ```bash
-docker compose up -d postgres
+docker compose up -d postgres redis
 docker compose run --rm api alembic upgrade head
 ```
 
@@ -40,17 +42,18 @@ docker compose run --rm backend biostack --help
 docker compose run --rm backend biostack doctor
 ```
 
-## Subir a API
+## Subir API e worker
 
 ```bash
-docker compose up -d api
+docker compose up -d worker api
 curl -f http://localhost:8000/api/v1/health
+docker compose ps
 docker compose down
 ```
 
 ## Fluxo end-to-end atual em container
 
-O fluxo obrigatório pode ser exercitado pela CLI ou pela API.
+O fluxo obrigatório pode ser exercitado pela CLI ou pela API com worker.
 
 Via CLI:
 
@@ -65,12 +68,12 @@ docker compose run --rm backend sh -lc '
 '
 ```
 
-Via API persistente:
+Via API assíncrona:
 
 ```bash
-docker compose up -d postgres
+docker compose up -d postgres redis
 docker compose run --rm api alembic upgrade head
-docker compose up -d api
+docker compose up -d worker api
 curl -f http://localhost:8000/api/v1/health
 curl -s -X POST http://localhost:8000/api/v1/projects \
   -H 'Content-Type: application/json' \
@@ -84,6 +87,8 @@ curl -s -X POST http://localhost:8000/api/v1/explain \
   -d '{"project_name":"demo-api","run":"latest","provider":"mock"}'
 docker compose down
 ```
+
+A criação da run pela API retorna `QUEUED`; o worker atualiza o status para `RUNNING` e depois `SUCCEEDED` ou `FAILED`.
 
 ## Testes Docker
 
@@ -111,4 +116,5 @@ make docker-down
 - Não grave chaves reais no repositório.
 - Não use `BIOSTACK_LLM_API_KEY` real em arquivos versionados.
 - O provider mock continua sendo o caminho padrão seguro para testes de troubleshooting operacional.
-- A API da phase_11 é local-first, sem autenticação de produção e não deve ser exposta publicamente.
+- A API da phase_12 é local-first, sem autenticação de produção e não deve ser exposta publicamente.
+- O worker não monta `/var/run/docker.sock`. Caso isso seja necessário para execução real com Docker/Nextflow, o risco deve ser documentado e revisado porque o socket permite controle elevado do host Docker.
