@@ -43,10 +43,12 @@ web = [
   "sqlalchemy>=2.0,<3.0",
   "psycopg[binary]>=3.2,<4.0",
   "alembic>=1.13,<2.0",
+  "redis>=5.0,<6.0",
 ]
 
 [project.scripts]
 biostack = "biostack.main:app"
+biostack-worker = "biostack.worker.runner:main"
 
 [project.urls]
 Homepage = "https://github.com/Klint-prog/BioStack-Workflows"

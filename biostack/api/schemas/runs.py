@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 
 class RunCreateRequest(BaseModel):
-    """Request body for synchronously starting a run."""
+    """Request body for starting an asynchronous run."""
 
     project_name: str
     workflow: str | None = None
@@ -29,3 +29,4 @@ class RunResponse(BaseModel):
     report_html_path: str
     return_code: int | None = None
     database_id: str | None = None
+    job_id: str | None = None
