@@ -12,6 +12,7 @@ def test_help_displays_available_commands() -> None:
     assert result.exit_code == 0
     assert "version" in result.output
     assert "doctor" in result.output
+    assert "init" in result.output
 
 
 def test_version_command_uses_centralized_version() -> None:
