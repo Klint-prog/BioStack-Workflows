@@ -28,3 +28,4 @@ class RunResponse(BaseModel):
     report_json_path: str
     report_html_path: str
     return_code: int | None = None
+    database_id: str | None = None

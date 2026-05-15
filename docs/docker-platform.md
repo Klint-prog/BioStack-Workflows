@@ -1,17 +1,18 @@
-# Docker Platform Edition — phase_10
+# Docker Platform Edition — phase_11
 
-A phase_10 adiciona uma API FastAPI mínima e versionada à base Docker criada na phase_09, sem alterar o MVP local-first nem substituir a CLI.
+A phase_11 adiciona PostgreSQL 16 e modelos persistentes à API FastAPI versionada criada na phase_10, sem alterar o MVP local-first nem substituir a CLI.
 
-Esta fase mantém filesystem local como persistência. Ela não adiciona PostgreSQL, Redis, fila, worker assíncrono, frontend React ou reverse proxy Nginx. Esses componentes pertencem a fases futuras.
+Esta fase mantém os relatórios, logs e arquivos de projeto no filesystem, mas grava metadados operacionais em banco. Ela não adiciona Redis, fila, worker assíncrono, frontend React ou reverse proxy Nginx. Esses componentes pertencem a fases futuras.
 
 ## Serviços disponíveis
 
-O `docker-compose.yml` define dois serviços:
+O `docker-compose.yml` define três serviços:
 
+- `postgres`: banco PostgreSQL 16 com healthcheck via `pg_isready`.
 - `backend`: preserva a CLI `biostack` dentro do container.
 - `api`: inicia `uvicorn biostack.api.app:app` e expõe a API em `http://localhost:8000/api/v1`.
 
-Ambos usam o volume nomeado `biostack_data` montado em `/workspace` para persistir projetos, logs e relatórios.
+`backend` e `api` usam o volume nomeado `biostack_data` montado em `/workspace` para persistir projetos, logs e relatórios. O PostgreSQL usa o volume `biostack_postgres_data`.
 
 ## Build
 
@@ -23,6 +24,13 @@ Ou pelo Makefile:
 
 ```bash
 make docker-build
+```
+
+## Subir PostgreSQL e aplicar migrations
+
+```bash
+docker compose up -d postgres
+docker compose run --rm api alembic upgrade head
 ```
 
 ## Validar a CLI em container
@@ -57,9 +65,11 @@ docker compose run --rm backend sh -lc '
 '
 ```
 
-Via API:
+Via API persistente:
 
 ```bash
+docker compose up -d postgres
+docker compose run --rm api alembic upgrade head
 docker compose up -d api
 curl -f http://localhost:8000/api/v1/health
 curl -s -X POST http://localhost:8000/api/v1/projects \
@@ -101,4 +111,4 @@ make docker-down
 - Não grave chaves reais no repositório.
 - Não use `BIOSTACK_LLM_API_KEY` real em arquivos versionados.
 - O provider mock continua sendo o caminho padrão seguro para testes de troubleshooting operacional.
-- A API da phase_10 é local-first, sem autenticação de produção e não deve ser exposta publicamente.
+- A API da phase_11 é local-first, sem autenticação de produção e não deve ser exposta publicamente.

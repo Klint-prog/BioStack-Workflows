@@ -23,6 +23,7 @@ class ProjectResponse(BaseModel):
     template: str
     workflow: str
     reports_count: int
+    database_id: str | None = None
 
 
 class ProjectCreateResponse(BaseModel):

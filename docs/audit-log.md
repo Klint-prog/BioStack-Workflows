@@ -97,3 +97,12 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: manter execução de runs síncrona e recomendada como dry-run nesta fase; fila, worker e Redis permanecem fora do escopo.
 - Decisão: adicionar serviço Compose `api` com Uvicorn e preservar o serviço `backend` para validação da CLI.
 - Observação: PostgreSQL, Redis, worker assíncrono, frontend React, Nginx e autenticação robusta permanecem explicitamente fora desta fase.
+
+## phase_11 — PostgreSQL e modelos persistentes
+
+- Decisão: adicionar PostgreSQL 16 ao Compose com healthcheck e volume próprio, sem introduzir Redis, worker assíncrono, frontend React ou Nginx.
+- Decisão: manter a CLI local-first sem exigir banco; a persistência entra pela API e por helpers de banco isolados em `biostack/db`.
+- Decisão: usar SQLAlchemy 2.x, Psycopg 3 e Alembic; testes usam SQLite temporário para viabilizar execução rápida sem serviço externo.
+- Decisão: persistir `Project`, `Run`, `RunEvent`, `RunFile` e `AuditEvent`, preservando relatórios HTML/JSON e logs no filesystem.
+- Decisão: exigir migrations via Alembic antes de operar a API em Compose; testes criam schema explicitamente para isolamento.
+- Observação: a migration e os modelos usam tipos portáveis para JSON/UUID, mapeando JSONB/UUID no PostgreSQL e JSON/CHAR em SQLite.
