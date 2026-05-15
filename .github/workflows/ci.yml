@@ -20,7 +20,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install package
-        run: python -m pip install -e ".[dev]"
+        run: python -m pip install -e ".[web,dev]"
 
       - name: Run tests
         run: pytest -q
@@ -38,7 +38,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install package
-        run: python -m pip install -e ".[dev]"
+        run: python -m pip install -e ".[web,dev]"
 
       - name: Run Ruff
         run: ruff check .

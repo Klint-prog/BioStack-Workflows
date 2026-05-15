@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: docker/backend.Dockerfile
-    image: biostack-workflows-backend:phase-09
+    image: biostack-workflows-backend:phase-10
     env_file:
       - .env.example
     environment:
@@ -11,6 +11,22 @@ services:
     volumes:
       - biostack_data:/workspace
     working_dir: /workspace
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    image: biostack-workflows-backend:phase-10
+    env_file:
+      - .env.example
+    environment:
+      BIOSTACK_WORKSPACE: /workspace
+    volumes:
+      - biostack_data:/workspace
+    working_dir: /workspace
+    command: uvicorn biostack.api.app:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
 
 volumes:
   biostack_data:

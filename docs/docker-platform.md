@@ -1,14 +1,17 @@
-# Docker Platform Edition — base da phase_09
+# Docker Platform Edition — phase_10
 
-A phase_09 inicia a transição do BioStack Workflows para a v0.2.0 Docker Platform Edition sem alterar o MVP local-first.
+A phase_10 adiciona uma API FastAPI mínima e versionada à base Docker criada na phase_09, sem alterar o MVP local-first nem substituir a CLI.
 
-Esta fase dockeriza apenas o backend/CLI atual. Ela não adiciona API versionada, PostgreSQL, Redis, worker com fila, frontend React ou reverse proxy Nginx. Esses componentes pertencem a fases futuras.
+Esta fase mantém filesystem local como persistência. Ela não adiciona PostgreSQL, Redis, fila, worker assíncrono, frontend React ou reverse proxy Nginx. Esses componentes pertencem a fases futuras.
 
 ## Serviços disponíveis
 
-O `docker-compose.yml` define apenas o serviço `backend`, com a CLI `biostack` instalada dentro do container.
+O `docker-compose.yml` define dois serviços:
 
-O volume nomeado `biostack_data` é montado em `/workspace` para persistir projetos, logs e relatórios criados durante os testes em container.
+- `backend`: preserva a CLI `biostack` dentro do container.
+- `api`: inicia `uvicorn biostack.api.app:app` e expõe a API em `http://localhost:8000/api/v1`.
+
+Ambos usam o volume nomeado `biostack_data` montado em `/workspace` para persistir projetos, logs e relatórios.
 
 ## Build
 
@@ -22,32 +25,6 @@ Ou pelo Makefile:
 make docker-build
 ```
 
-## Subir serviço base
-
-```bash
-docker compose up
-```
-
-Ou:
-
-```bash
-make docker-up
-```
-
-Como o objetivo da fase é validar a CLI, o comando padrão do container exibe `biostack --help`.
-
-## Shell no container
-
-```bash
-docker compose run --rm backend sh
-```
-
-Ou:
-
-```bash
-make docker-shell
-```
-
 ## Validar a CLI em container
 
 ```bash
@@ -55,9 +32,19 @@ docker compose run --rm backend biostack --help
 docker compose run --rm backend biostack doctor
 ```
 
+## Subir a API
+
+```bash
+docker compose up -d api
+curl -f http://localhost:8000/api/v1/health
+docker compose down
+```
+
 ## Fluxo end-to-end atual em container
 
-O fluxo obrigatório do MVP continua baseado na CLI:
+O fluxo obrigatório pode ser exercitado pela CLI ou pela API.
+
+Via CLI:
 
 ```bash
 docker compose run --rm backend sh -lc '
@@ -70,21 +57,30 @@ docker compose run --rm backend sh -lc '
 '
 ```
 
-Para visualizar pelo painel local dentro do container em fases futuras será necessário expor porta e revisar o modo de execução. Nesta fase, a validação principal é CLI e geração de artefatos no volume `/workspace`.
-
-## Testes Docker
+Via API:
 
 ```bash
-make docker-test
+docker compose up -d api
+curl -f http://localhost:8000/api/v1/health
+curl -s -X POST http://localhost:8000/api/v1/projects \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"demo-api","template":"rnaseq-basic"}'
+curl -s -X POST http://localhost:8000/api/v1/runs \
+  -H 'Content-Type: application/json' \
+  -d '{"project_name":"demo-api","dry_run":true}'
+curl -s 'http://localhost:8000/api/v1/reports?project_name=demo-api'
+curl -s -X POST http://localhost:8000/api/v1/explain \
+  -H 'Content-Type: application/json' \
+  -d '{"project_name":"demo-api","run":"latest","provider":"mock"}'
+docker compose down
 ```
 
-Esse target executa:
+## Testes Docker
 
 ```bash
 docker compose run --rm backend pytest -q
 docker compose run --rm backend ruff check .
 docker compose run --rm backend biostack --help
-docker compose run --rm backend biostack doctor
 ```
 
 ## Encerrar e limpar containers
@@ -105,3 +101,4 @@ make docker-down
 - Não grave chaves reais no repositório.
 - Não use `BIOSTACK_LLM_API_KEY` real em arquivos versionados.
 - O provider mock continua sendo o caminho padrão seguro para testes de troubleshooting operacional.
+- A API da phase_10 é local-first, sem autenticação de produção e não deve ser exposta publicamente.

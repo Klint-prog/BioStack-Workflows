@@ -88,3 +88,12 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: manter o serviço Compose com o nome `backend`, alinhado aos comandos mínimos da fase (`docker compose run --rm backend ...`).
 - Decisão: adicionar `.env.example` sem segredos reais e `.dockerignore` para reduzir contexto de build e evitar envio acidental de ambientes locais.
 - Observação: Postgres, Redis, worker, API FastAPI versionada, frontend React e Nginx permanecem explicitamente fora desta fase.
+
+## phase_10 — API FastAPI versionada
+
+- Decisão: criar a API mínima em `/api/v1`, preservando a CLI e o painel web local existentes.
+- Decisão: usar `BIOSTACK_WORKSPACE` como raiz de filesystem da API, com descoberta limitada ao workspace e subdiretórios imediatos.
+- Decisão: reaproveitar `create_project`, `run_workflow`, geração de relatórios e provider mock existentes, evitando duplicar regra de negócio da CLI.
+- Decisão: manter execução de runs síncrona e recomendada como dry-run nesta fase; fila, worker e Redis permanecem fora do escopo.
+- Decisão: adicionar serviço Compose `api` com Uvicorn e preservar o serviço `backend` para validação da CLI.
+- Observação: PostgreSQL, Redis, worker assíncrono, frontend React, Nginx e autenticação robusta permanecem explicitamente fora desta fase.
