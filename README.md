@@ -48,6 +48,9 @@ BioStack Workflows organiza a execução de pipelines usando uma combinação de
 - Docker e Docker Compose para reprodutibilidade de ambiente.
 - FastAPI e Uvicorn como dependências opcionais do painel web local e da API versionada.
 - SQLAlchemy, Psycopg e Alembic para persistência PostgreSQL na Docker Platform Edition.
+- React, Vite e TypeScript para o frontend separado da Docker Platform Edition.
+- Redis 7 para fila simples do worker.
+- Nginx para reverse proxy local da plataforma.
 - Interface abstrata de provider LLM para troubleshooting operacional opcional.
 - Relatórios HTML e JSON com metadados, versões, parâmetros, logs e checksums.
 
@@ -109,26 +112,24 @@ Para executar o workflow real, instale Nextflow e Docker e rode:
 biostack run --workflow rnaseq-basic --profile docker
 ```
 
-## Docker Platform Edition em desenvolvimento
+## Docker Platform Edition
 
-A v0.2.0 Docker Platform Edition já possui backend/CLI em container, API FastAPI versionada mínima em `/api/v1` e persistência PostgreSQL para projetos e runs.
+A v0.2.0 Docker Platform Edition possui backend/CLI em container, API FastAPI versionada em `/api/v1`, persistência PostgreSQL, Redis, worker assíncrono, frontend React/Vite e reverse proxy Nginx.
 
 ```bash
-docker compose build
-docker compose up -d postgres
-docker compose run --rm api alembic upgrade head
-docker compose up -d api
-curl -f http://localhost:8000/api/v1/health
+docker compose up --build -d
+curl -f http://localhost:8080/api/v1/health
+bash scripts/e2e-smoke.sh
 docker compose down
 ```
 
-Redis, worker assíncrono, frontend React e Nginx ainda não fazem parte desta fase e serão tratados em fases futuras.
+Acesse `http://localhost:8080` para criar projeto, executar dry-run, acompanhar runs, abrir relatórios e explicar logs com IA mock.
 
-Leia mais em [docs/docker-platform.md](docs/docker-platform.md), [docs/database.md](docs/database.md) e [docs/api.md](docs/api.md).
+Leia mais em [docs/docker-platform.md](docs/docker-platform.md), [docs/e2e.md](docs/e2e.md), [docs/database.md](docs/database.md) e [docs/api.md](docs/api.md).
 
 ## API FastAPI versionada
 
-A API local-first expõe healthcheck, projetos, runs síncronos, relatórios e explain mock em `/api/v1`. A phase_11 persiste projetos e runs no banco, mantendo relatórios HTML/JSON no filesystem.
+A API local-first expõe healthcheck, projetos, runs assíncronos via worker, relatórios e explain mock em `/api/v1`.
 
 ```bash
 python -m pip install -e ".[web,dev]"
@@ -235,12 +236,13 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 - [Persistência PostgreSQL](docs/database.md)
 - [IA operacional e troubleshooting](docs/ai-troubleshooting.md)
 - [Docker Platform Edition](docs/docker-platform.md)
+- [Validação end-to-end](docs/e2e.md)
 - [Audit log](docs/audit-log.md)
 - [Changelog](CHANGELOG.md)
 
 ## Estado atual
 
-Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, painel web local opcional, IA operacional opcional para troubleshooting técnico, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo. A base inicial da v0.2.0 Docker Platform Edition está em desenvolvimento incremental com API mínima versionada e persistência PostgreSQL, sem substituir a CLI atual.
+Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, painel web local opcional, IA operacional opcional para troubleshooting técnico, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo. A base da v0.2.0 Docker Platform Edition está em desenvolvimento incremental com stack dockerizada integrada, preservando a CLI atual.
 
 ## Licença
 
