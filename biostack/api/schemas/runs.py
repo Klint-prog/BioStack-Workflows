@@ -30,3 +30,5 @@ class RunResponse(BaseModel):
     return_code: int | None = None
     database_id: str | None = None
     job_id: str | None = None
+    created_at: str | None = None
+    updated_at: str | None = None
