@@ -46,7 +46,11 @@ class ReportSummary:
 
 def _candidate_roots(base_dir: Path) -> list[Path]:
     roots = [base_dir]
-    roots.extend(path for path in sorted(base_dir.iterdir()) if path.is_dir() and not path.name.startswith("."))
+    roots.extend(
+        path
+        for path in sorted(base_dir.iterdir())
+        if path.is_dir() and not path.name.startswith(".")
+    )
     return roots
 
 
@@ -150,4 +154,7 @@ def report_detail(run_id: str):
     for report in discover_reports():
         if report.run_id == run_id and report.html_path and report.html_path.is_file():
             return FileResponse(report.html_path, media_type="text/html")
-    raise HTTPException(status_code=404, detail=f"Relatório HTML não encontrado para run '{run_id}'.")
+    raise HTTPException(
+        status_code=404,
+        detail=f"Relatório HTML não encontrado para run '{run_id}'.",
+    )
