@@ -24,7 +24,8 @@ O release v0.2.0 consolida a Docker Platform Edition:
 - Redis 7 para fila local simples.
 - Worker assíncrono para processamento de runs.
 - Frontend React/Vite separado.
-- Reverse proxy Nginx em `http://localhost:8080`.
+- Painel operacional com dashboard, projetos, runs, relatórios e explain consumindo dados reais da API.
+- Reverse proxy Nginx em `http://localhost:8969`.
 - Healthchecks, restart policies, rotação básica de logs e containers Python não-root.
 - IA operacional opcional para troubleshooting técnico de logs e metadados, sem interpretação biológica ou clínica.
 - CI com testes automatizados, lint Ruff e build frontend.
@@ -111,14 +112,26 @@ A v0.2.0 Docker Platform Edition possui backend/CLI em container, API FastAPI ve
 
 ```bash
 docker compose up --build -d
-curl -f http://localhost:8080/api/v1/health
+curl -f http://localhost:8969/api/v1/health
 bash scripts/e2e-smoke.sh
 docker compose down
 ```
 
-Acesse `http://localhost:8080` para criar projeto, executar dry-run, acompanhar runs, abrir relatórios e explicar logs com IA mock.
+Acesse `http://localhost:8969` para usar o painel operacional: dashboard com métricas reais da API, criação de projetos, dry-runs, runs com status visual, relatórios JSON e explain mock.
 
-Leia mais em [docs/docker-platform.md](docs/docker-platform.md), [docs/e2e.md](docs/e2e.md), [docs/database.md](docs/database.md) e [docs/api.md](docs/api.md).
+Portas externas padrão da plataforma Docker:
+
+- `8969`: entrada principal via Nginx.
+- `8970`: frontend direto para debug.
+- `8971`: API direta para debug.
+
+Fluxo operacional da UI:
+
+```text
+Browser -> Nginx -> Frontend React/Vite -> API FastAPI -> PostgreSQL/Redis/Worker -> Workspace compartilhado
+```
+
+Leia mais em [docs/docker-platform.md](docs/docker-platform.md), [docs/frontend-ux.md](docs/frontend-ux.md), [docs/e2e.md](docs/e2e.md), [docs/database.md](docs/database.md) e [docs/api.md](docs/api.md).
 
 ## Hardening operacional da v0.2.0
 
@@ -139,8 +152,8 @@ A API local-first expõe healthcheck, projetos, runs assíncronos via worker, re
 
 ```bash
 python -m pip install -e ".[web,dev]"
-uvicorn biostack.api.app:app --host 127.0.0.1 --port 8000
-curl -f http://127.0.0.1:8000/api/v1/health
+uvicorn biostack.api.app:app --host 127.0.0.1 --port 8971
+curl -f http://127.0.0.1:8971/api/v1/health
 ```
 
 Leia mais em [docs/api.md](docs/api.md).
@@ -151,10 +164,10 @@ O painel web é opcional, experimental, local e sem autenticação. Ele serve pa
 
 ```bash
 python -m pip install -e ".[web]"
-biostack web --host 127.0.0.1 --port 8000
+biostack web --host 127.0.0.1 --port 8972
 ```
 
-Depois acesse `http://127.0.0.1:8000/` em um navegador local. Não exponha esse servidor em redes públicas.
+Depois acesse `http://127.0.0.1:8972/` em um navegador local. Não exponha esse servidor em redes públicas.
 
 Leia mais em [docs/web-ui.md](docs/web-ui.md).
 
@@ -199,7 +212,7 @@ cd frontend && npm install && npm run build
 cd ..
 docker compose build
 docker compose up -d
-curl -f http://localhost:8080/api/v1/health
+curl -f http://localhost:8969/api/v1/health
 bash scripts/e2e-smoke.sh
 docker compose ps
 docker compose down
@@ -226,7 +239,7 @@ A v0.2.0 entrega:
 4. Capturar metadados de execução.
 5. Registrar versões, parâmetros, logs e checksums.
 6. Gerar relatório HTML e JSON.
-7. Visualizar projetos e relatórios em painel web local e frontend Docker.
+7. Visualizar projetos, runs e relatórios em painel operacional Docker.
 8. Persistir projetos/runs/eventos em PostgreSQL.
 9. Processar jobs por worker Redis simples.
 10. Explicar falhas operacionais com IA opcional limitada a troubleshooting técnico.
@@ -234,7 +247,7 @@ A v0.2.0 entrega:
 ## Roadmap
 
 - v0.1.x: MVP local-first com CLI, relatórios, painel local e IA operacional mock.
-- v0.2.0: Docker Platform Edition com backend/API, banco, fila, worker, frontend separado, reverse proxy, hardening e documentação operacional.
+- v0.2.0: Docker Platform Edition com backend/API, banco, fila, worker, frontend separado, reverse proxy, hardening, dashboard operacional e documentação.
 - Futuro: autenticação, cloud, registry de imagens, HPC/SLURM, Apptainer, observabilidade avançada, multiusuário, RBAC e institucionalização.
 
 ## Fora do escopo atual
@@ -262,6 +275,7 @@ Para manter a plataforma realista, a v0.2.0 não inclui:
 - [Persistência PostgreSQL](docs/database.md)
 - [IA operacional e troubleshooting](docs/ai-troubleshooting.md)
 - [Docker Platform Edition](docs/docker-platform.md)
+- [Frontend UX operacional](docs/frontend-ux.md)
 - [Validação end-to-end](docs/e2e.md)
 - [Segurança operacional](docs/security.md)
 - [Performance operacional](docs/performance.md)
@@ -272,7 +286,7 @@ Para manter a plataforma realista, a v0.2.0 não inclui:
 
 ## Estado atual
 
-Este repositório está preparando o release v0.2.0 Docker Platform Edition: CLI preservada, API, banco, fila, worker, frontend, Nginx, hardening operacional, documentação de segurança/performance/backup/troubleshooting e fluxo end-to-end obrigatório.
+Este repositório está preparando o release v0.2.0 Docker Platform Edition: CLI preservada, API, banco, fila, worker, frontend operacional, Nginx, hardening operacional, documentação de segurança/performance/backup/troubleshooting e fluxo end-to-end obrigatório.
 
 ## Licença
 
