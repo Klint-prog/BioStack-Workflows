@@ -8,7 +8,31 @@ from datetime import UTC, datetime
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy.types import JSON, TypeDecorator
+from sqlalchemy.types import CHAR, JSON, TypeDecorator
+
+
+class Guid(TypeDecorator):
+    """Use PostgreSQL UUID and a portable CHAR representation elsewhere."""
+
+    impl = CHAR
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):  # type: ignore[no-untyped-def]
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(UUID(as_uuid=True))
+        return dialect.type_descriptor(CHAR(36))
+
+    def process_bind_param(self, value, dialect):  # type: ignore[no-untyped-def]
+        if value is None:
+            return value
+        if dialect.name == "postgresql":
+            return value if isinstance(value, uuid.UUID) else uuid.UUID(str(value))
+        return str(value if isinstance(value, uuid.UUID) else uuid.UUID(str(value)))
+
+    def process_result_value(self, value, dialect):  # type: ignore[no-untyped-def]
+        if value is None:
+            return value
+        return value if isinstance(value, uuid.UUID) else uuid.UUID(str(value))
 
 
 class JsonDocument(TypeDecorator):
@@ -37,7 +61,7 @@ class Project(Base):
 
     __tablename__ = "projects"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(Guid, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
     path: Mapped[str] = mapped_column(Text, nullable=False)
     template: Mapped[str] = mapped_column(String(120), nullable=False)
@@ -57,9 +81,9 @@ class Run(Base):
     __tablename__ = "runs"
     __table_args__ = (UniqueConstraint("project_id", "run_id", name="uq_runs_project_run_id"),)
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(Guid, primary_key=True, default=uuid.uuid4)
     project_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+        Guid, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
     )
     run_id: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
     workflow: Mapped[str] = mapped_column(String(120), nullable=False)
@@ -87,9 +111,9 @@ class RunEvent(Base):
 
     __tablename__ = "run_events"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(Guid, primary_key=True, default=uuid.uuid4)
     run_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("runs.id", ondelete="CASCADE"), nullable=False, index=True
+        Guid, ForeignKey("runs.id", ondelete="CASCADE"), nullable=False, index=True
     )
     event_type: Mapped[str] = mapped_column(String(120), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
@@ -104,9 +128,9 @@ class RunFile(Base):
 
     __tablename__ = "run_files"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(Guid, primary_key=True, default=uuid.uuid4)
     run_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("runs.id", ondelete="CASCADE"), nullable=False, index=True
+        Guid, ForeignKey("runs.id", ondelete="CASCADE"), nullable=False, index=True
     )
     path: Mapped[str] = mapped_column(Text, nullable=False)
     checksum_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
@@ -121,7 +145,7 @@ class AuditEvent(Base):
 
     __tablename__ = "audit_events"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(Guid, primary_key=True, default=uuid.uuid4)
     actor: Mapped[str] = mapped_column(String(120), nullable=False, default="system")
     action: Mapped[str] = mapped_column(String(160), nullable=False, index=True)
     entity_type: Mapped[str] = mapped_column(String(120), nullable=False)
