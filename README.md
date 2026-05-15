@@ -46,7 +46,7 @@ BioStack Workflows organiza a execução de pipelines usando uma combinação de
 - PyYAML para configuração declarativa.
 - Nextflow como motor de workflow científico.
 - Docker e Docker Compose para reprodutibilidade de ambiente.
-- FastAPI e Uvicorn como dependências opcionais do painel web local.
+- FastAPI e Uvicorn como dependências opcionais do painel web local e da API versionada.
 - Interface abstrata de provider LLM para troubleshooting operacional opcional.
 - Relatórios HTML e JSON com metadados, versões, parâmetros, logs e checksums.
 
@@ -74,13 +74,13 @@ Com dependências de desenvolvimento:
 python -m pip install -e ".[dev]"
 ```
 
-Com dependências opcionais do painel web local:
+Com dependências opcionais web:
 
 ```bash
 python -m pip install -e ".[web]"
 ```
 
-Com desenvolvimento e painel web:
+Com desenvolvimento e dependências web:
 
 ```bash
 python -m pip install -e ".[web,dev]"
@@ -110,17 +110,31 @@ biostack run --workflow rnaseq-basic --profile docker
 
 ## Docker Platform Edition em desenvolvimento
 
-A v0.2.0 Docker Platform Edition começou pela base Docker da CLI atual. Nesta etapa existe apenas o serviço `backend` no Docker Compose, com volume persistente em `/workspace`.
+A v0.2.0 Docker Platform Edition já possui backend/CLI em container e API FastAPI versionada mínima em `/api/v1`.
 
 ```bash
 docker compose build
 docker compose run --rm backend biostack --help
-docker compose run --rm backend biostack doctor
+docker compose up -d api
+curl -f http://localhost:8000/api/v1/health
+docker compose down
 ```
 
-Banco PostgreSQL, Redis, worker, API versionada, frontend React e Nginx ainda não fazem parte desta fase e serão tratados em fases futuras.
+PostgreSQL, Redis, worker assíncrono, frontend React e Nginx ainda não fazem parte desta fase e serão tratados em fases futuras.
 
-Leia mais em [docs/docker-platform.md](docs/docker-platform.md).
+Leia mais em [docs/docker-platform.md](docs/docker-platform.md) e [docs/api.md](docs/api.md).
+
+## API FastAPI versionada
+
+A API local-first expõe healthcheck, projetos, runs síncronos, relatórios e explain mock em `/api/v1`, ainda usando filesystem local.
+
+```bash
+python -m pip install -e ".[web,dev]"
+uvicorn biostack.api.app:app --host 127.0.0.1 --port 8000
+curl -f http://127.0.0.1:8000/api/v1/health
+```
+
+Leia mais em [docs/api.md](docs/api.md).
 
 ## Painel web local experimental
 
@@ -215,6 +229,7 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 - [Demo do MVP](docs/demo.md)
 - [Relatórios](docs/reports.md)
 - [Painel web local](docs/web-ui.md)
+- [API FastAPI versionada](docs/api.md)
 - [IA operacional e troubleshooting](docs/ai-troubleshooting.md)
 - [Docker Platform Edition](docs/docker-platform.md)
 - [Audit log](docs/audit-log.md)
@@ -222,7 +237,7 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 
 ## Estado atual
 
-Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, painel web local opcional, IA operacional opcional para troubleshooting técnico, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo. A base inicial da v0.2.0 Docker Platform Edition está em desenvolvimento incremental sem substituir a CLI atual.
+Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, painel web local opcional, IA operacional opcional para troubleshooting técnico, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo. A base inicial da v0.2.0 Docker Platform Edition está em desenvolvimento incremental com API mínima versionada, sem substituir a CLI atual.
 
 ## Licença
 
