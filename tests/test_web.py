@@ -1,14 +1,17 @@
+from importlib import import_module
 from pathlib import Path
 
 import pytest
 
-fastapi = pytest.importorskip("fastapi")
-from fastapi.testclient import TestClient
+pytest.importorskip("fastapi")
 
-from biostack.core.project import create_project
-from biostack.core.runner import run_workflow
-from biostack.web.app import create_app
-from biostack.web.routes import discover_projects, discover_reports
+TestClient = import_module("fastapi.testclient").TestClient
+create_project = import_module("biostack.core.project").create_project
+run_workflow = import_module("biostack.core.runner").run_workflow
+create_app = import_module("biostack.web.app").create_app
+routes = import_module("biostack.web.routes")
+discover_projects = routes.discover_projects
+discover_reports = routes.discover_reports
 
 
 def test_web_index_and_reports_routes_render_empty_state(tmp_path: Path, monkeypatch) -> None:
