@@ -70,3 +70,12 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: reaproveitar relatórios HTML/JSON existentes em `reports/`, sem duplicar a camada de geração de relatórios.
 - Decisão: descobrir projetos apenas no diretório atual e subdiretórios imediatos para evitar varreduras amplas no filesystem.
 - Decisão: usar FastAPI + Jinja2 e manter HTMX fora do caminho crítico, sem React/Webpack/frontend pesado.
+
+## phase_08 — IA operacional e troubleshooting
+
+- Decisão: adicionar IA apenas como camada opcional de troubleshooting técnico sobre logs e metadados, sem interpretação biológica ou clínica.
+- Decisão: exibir o aviso `AVISO: Não usar para diagnóstico ou interpretação clínica.` em toda execução de `biostack explain`, inclusive em falhas amigáveis.
+- Decisão: criar uma interface abstrata `LLMProvider` e um provider `mock` determinístico para testes sem rede, sem chave de API e sem dependência externa.
+- Decisão: manter a configuração de provider real por variável de ambiente `BIOSTACK_LLM_API_KEY`, sem gravar chaves no repositório.
+- Decisão: limitar logs enviados ao prompt aos últimos 12.000 caracteres, preservando simplicidade e reduzindo risco de prompts excessivos no MVP.
+- Observação: o provider real `env` valida a presença de chave, mas a chamada externa concreta permanece fora do MVP inicial; o projeto segue funcional sem IA.

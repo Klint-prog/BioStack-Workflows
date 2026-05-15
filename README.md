@@ -15,13 +15,14 @@ O projeto começa pequeno: uma CLI em Python capaz de preparar um projeto BioSta
 
 O release público v0.1.0 consolida o MVP local-first:
 
-- CLI instalável com `biostack --help`, `biostack version`, `biostack doctor`, `biostack init`, `biostack run`, `biostack report` e `biostack web`.
+- CLI instalável com `biostack --help`, `biostack version`, `biostack doctor`, `biostack init`, `biostack run`, `biostack report`, `biostack web` e `biostack explain`.
 - Templates `rnaseq-basic` e `variant-calling-basic` para criar estruturas auditáveis de projeto.
 - Execução real ou simulada via Nextflow, com `--dry-run` para ambientes sem Nextflow.
 - Relatórios HTML e JSON com metadados, versões, parâmetros, logs e checksums SHA256 dos inputs.
 - Painel web local experimental e opcional para visualizar projetos, execuções e relatórios sem substituir a CLI.
+- IA operacional opcional para troubleshooting técnico de logs e metadados, sem interpretação biológica ou clínica.
 - CI com testes automatizados e lint usando Ruff.
-- Documentação de instalação, demo, relatórios e painel web local.
+- Documentação de instalação, demo, relatórios, painel web local e IA operacional.
 
 ## Problema
 
@@ -46,6 +47,7 @@ BioStack Workflows organiza a execução de pipelines usando uma combinação de
 - Nextflow como motor de workflow científico.
 - Docker e Docker Compose para reprodutibilidade de ambiente.
 - FastAPI e Uvicorn como dependências opcionais do painel web local.
+- Interface abstrata de provider LLM para troubleshooting operacional opcional.
 - Relatórios HTML e JSON com metadados, versões, parâmetros, logs e checksums.
 
 ## Instalação
@@ -95,6 +97,7 @@ biostack init demo --template rnaseq-basic
 cd demo
 biostack run --dry-run
 biostack report --run latest
+biostack explain --run latest --provider mock
 ```
 
 O `--dry-run` mostra o comando Nextflow sem executar e cria evidências auditáveis em `logs/` e `reports/`.
@@ -117,6 +120,24 @@ biostack web --host 127.0.0.1 --port 8000
 Depois acesse `http://127.0.0.1:8000/` em um navegador local. Não exponha esse servidor em redes públicas.
 
 Leia mais em [docs/web-ui.md](docs/web-ui.md).
+
+## IA operacional e troubleshooting
+
+O comando `biostack explain` resume logs, explica falhas técnicas e sugere próximos passos operacionais a partir de metadados e logs de um run.
+
+```bash
+biostack explain --run latest --provider mock
+```
+
+Aviso obrigatório exibido em toda execução:
+
+```text
+AVISO: Não usar para diagnóstico ou interpretação clínica.
+```
+
+O provider `mock` é determinístico e usado em testes. O provider `env` exige a variável `BIOSTACK_LLM_API_KEY`, mas o MVP ainda não implementa chamadas externas reais.
+
+Leia mais em [docs/ai-troubleshooting.md](docs/ai-troubleshooting.md).
 
 ## Demo
 
@@ -154,6 +175,7 @@ O MVP entrega uma CLI capaz de:
 5. Registrar versões, parâmetros, logs e checksums.
 6. Gerar relatório HTML e JSON.
 7. Visualizar projetos e relatórios em painel web local opcional.
+8. Explicar falhas operacionais com IA opcional limitada a troubleshooting técnico.
 
 ## Roadmap
 
@@ -179,12 +201,13 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 - [Demo do MVP](docs/demo.md)
 - [Relatórios](docs/reports.md)
 - [Painel web local](docs/web-ui.md)
+- [IA operacional e troubleshooting](docs/ai-troubleshooting.md)
 - [Audit log](docs/audit-log.md)
 - [Changelog](CHANGELOG.md)
 
 ## Estado atual
 
-Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, painel web local opcional, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo.
+Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, painel web local opcional, IA operacional opcional para troubleshooting técnico, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo.
 
 ## Licença
 
