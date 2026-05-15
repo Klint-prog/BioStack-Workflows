@@ -8,15 +8,25 @@ A plataforma continua local-first, sem autenticação robusta, sem Kubernetes, s
 
 O `docker-compose.yml` define seis serviços principais e um serviço auxiliar de backend/CLI:
 
-- `nginx`: reverse proxy público da plataforma em `http://localhost:8080`, roteando `/` para o frontend e `/api/` para a API.
-- `frontend`: build React/Vite servido por Nginx interno, ainda acessível diretamente em `http://localhost:5173` para debug.
-- `api`: FastAPI versionada em `/api/v1`, com migrations Alembic aplicadas no startup do container.
+- `nginx`: reverse proxy público da plataforma em `http://localhost:8969`, roteando `/` para o frontend e `/api/` para a API.
+- `frontend`: build React/Vite servido por Nginx interno, ainda acessível diretamente em `http://localhost:8970` para debug.
+- `api`: FastAPI versionada em `/api/v1`, ainda acessível diretamente em `http://localhost:8971` para debug, com migrations Alembic aplicadas no startup do container.
 - `worker`: consumidor Redis que processa jobs de execução e atualiza runs persistidas.
 - `backend`: container auxiliar para comandos CLI e diagnósticos.
 - `postgres`: PostgreSQL 16 com volume persistente para projetos/runs/eventos.
 - `redis`: Redis 7 com AOF e volume persistente para fila/cache local.
 
 `backend`, `api` e `worker` usam o volume `biostack_workspace` montado em `/workspace`; projetos, logs e relatórios HTML/JSON ficam persistidos nesse volume.
+
+## Portas externas padrão
+
+A plataforma usa portas altas por padrão para reduzir conflitos com outros serviços locais:
+
+- `PLATFORM_PORT=8969`: entrada principal via Nginx.
+- `FRONTEND_PORT=8970`: frontend direto para debug.
+- `API_PORT=8971`: API direta para debug.
+
+As portas internas dos containers continuam as mesmas: API em `8000` e frontend/Nginx em `80`.
 
 ## Hardening aplicado na v0.2.0
 
@@ -34,10 +44,10 @@ O `docker-compose.yml` define seis serviços principais e um serviço auxiliar d
 
 ```bash
 docker compose up --build -d
-curl -f http://localhost:8080/api/v1/health
+curl -f http://localhost:8969/api/v1/health
 ```
 
-Depois acesse `http://localhost:8080` no navegador.
+Depois acesse `http://localhost:8969` no navegador.
 
 ## Fluxo obrigatório
 
@@ -55,7 +65,7 @@ Pela interface ou via HTTP, valide:
 bash scripts/e2e-smoke.sh
 ```
 
-O script usa `BIOSTACK_E2E_BASE_URL`, com padrão `http://localhost:8080`, e executa o fluxo obrigatório via API através do Nginx.
+O script usa `BIOSTACK_E2E_BASE_URL`, com padrão `http://localhost:8969`, e executa o fluxo obrigatório via API através do Nginx.
 
 ## Comandos úteis
 
