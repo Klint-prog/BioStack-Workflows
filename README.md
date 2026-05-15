@@ -47,6 +47,7 @@ BioStack Workflows organiza a execução de pipelines usando uma combinação de
 - Nextflow como motor de workflow científico.
 - Docker e Docker Compose para reprodutibilidade de ambiente.
 - FastAPI e Uvicorn como dependências opcionais do painel web local e da API versionada.
+- SQLAlchemy, Psycopg e Alembic para persistência PostgreSQL na Docker Platform Edition.
 - Interface abstrata de provider LLM para troubleshooting operacional opcional.
 - Relatórios HTML e JSON com metadados, versões, parâmetros, logs e checksums.
 
@@ -110,23 +111,24 @@ biostack run --workflow rnaseq-basic --profile docker
 
 ## Docker Platform Edition em desenvolvimento
 
-A v0.2.0 Docker Platform Edition já possui backend/CLI em container e API FastAPI versionada mínima em `/api/v1`.
+A v0.2.0 Docker Platform Edition já possui backend/CLI em container, API FastAPI versionada mínima em `/api/v1` e persistência PostgreSQL para projetos e runs.
 
 ```bash
 docker compose build
-docker compose run --rm backend biostack --help
+docker compose up -d postgres
+docker compose run --rm api alembic upgrade head
 docker compose up -d api
 curl -f http://localhost:8000/api/v1/health
 docker compose down
 ```
 
-PostgreSQL, Redis, worker assíncrono, frontend React e Nginx ainda não fazem parte desta fase e serão tratados em fases futuras.
+Redis, worker assíncrono, frontend React e Nginx ainda não fazem parte desta fase e serão tratados em fases futuras.
 
-Leia mais em [docs/docker-platform.md](docs/docker-platform.md) e [docs/api.md](docs/api.md).
+Leia mais em [docs/docker-platform.md](docs/docker-platform.md), [docs/database.md](docs/database.md) e [docs/api.md](docs/api.md).
 
 ## API FastAPI versionada
 
-A API local-first expõe healthcheck, projetos, runs síncronos, relatórios e explain mock em `/api/v1`, ainda usando filesystem local.
+A API local-first expõe healthcheck, projetos, runs síncronos, relatórios e explain mock em `/api/v1`. A phase_11 persiste projetos e runs no banco, mantendo relatórios HTML/JSON no filesystem.
 
 ```bash
 python -m pip install -e ".[web,dev]"
@@ -230,6 +232,7 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 - [Relatórios](docs/reports.md)
 - [Painel web local](docs/web-ui.md)
 - [API FastAPI versionada](docs/api.md)
+- [Persistência PostgreSQL](docs/database.md)
 - [IA operacional e troubleshooting](docs/ai-troubleshooting.md)
 - [Docker Platform Edition](docs/docker-platform.md)
 - [Audit log](docs/audit-log.md)
@@ -237,7 +240,7 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 
 ## Estado atual
 
-Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, painel web local opcional, IA operacional opcional para troubleshooting técnico, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo. A base inicial da v0.2.0 Docker Platform Edition está em desenvolvimento incremental com API mínima versionada, sem substituir a CLI atual.
+Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, painel web local opcional, IA operacional opcional para troubleshooting técnico, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo. A base inicial da v0.2.0 Docker Platform Edition está em desenvolvimento incremental com API mínima versionada e persistência PostgreSQL, sem substituir a CLI atual.
 
 ## Licença
 
