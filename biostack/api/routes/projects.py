@@ -6,7 +6,11 @@ from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 
-from biostack.api.schemas.projects import ProjectCreateRequest, ProjectCreateResponse, ProjectResponse
+from biostack.api.schemas.projects import (
+    ProjectCreateRequest,
+    ProjectCreateResponse,
+    ProjectResponse,
+)
 from biostack.api.workspace import WorkspaceError, discover_project_configs, workspace_root
 from biostack.core.config import BioStackConfig
 from biostack.core.project import ProjectAlreadyExistsError, ProjectCreationError, create_project
