@@ -9,20 +9,25 @@ BioStack Workflows é uma infraestrutura open source para criar, executar, docum
 
 A visão do projeto é oferecer uma camada simples, auditável e extensível para pesquisadores, estudantes, analistas de bioinformática e equipes técnicas que precisam executar pipelines científicos com rastreabilidade operacional.
 
-O projeto começa pequeno: uma CLI em Python capaz de preparar um projeto BioStack, validar o ambiente, executar workflows com Nextflow e Docker, e gerar relatórios reprodutíveis em HTML e JSON.
+O projeto começou como uma CLI local-first em Python e agora inclui a v0.2.0 Docker Platform Edition: API FastAPI, PostgreSQL, Redis, worker, frontend React/Vite e Nginx em Docker Compose, preservando a CLI.
 
-## O que existe no v0.1.0
+## O que existe no v0.2.0
 
-O release público v0.1.0 consolida o MVP local-first:
+O release v0.2.0 consolida a Docker Platform Edition:
 
 - CLI instalável com `biostack --help`, `biostack version`, `biostack doctor`, `biostack init`, `biostack run`, `biostack report`, `biostack web` e `biostack explain`.
 - Templates `rnaseq-basic` e `variant-calling-basic` para criar estruturas auditáveis de projeto.
 - Execução real ou simulada via Nextflow, com `--dry-run` para ambientes sem Nextflow.
 - Relatórios HTML e JSON com metadados, versões, parâmetros, logs e checksums SHA256 dos inputs.
-- Painel web local experimental e opcional para visualizar projetos, execuções e relatórios sem substituir a CLI.
+- API FastAPI versionada em `/api/v1`.
+- Persistência PostgreSQL com migrations Alembic.
+- Redis 7 para fila local simples.
+- Worker assíncrono para processamento de runs.
+- Frontend React/Vite separado.
+- Reverse proxy Nginx em `http://localhost:8080`.
+- Healthchecks, restart policies, rotação básica de logs e containers Python não-root.
 - IA operacional opcional para troubleshooting técnico de logs e metadados, sem interpretação biológica ou clínica.
-- CI com testes automatizados e lint usando Ruff.
-- Documentação de instalação, demo, relatórios, painel web local e IA operacional.
+- CI com testes automatizados, lint Ruff e build frontend.
 
 ## Problema
 
@@ -46,15 +51,15 @@ BioStack Workflows organiza a execução de pipelines usando uma combinação de
 - PyYAML para configuração declarativa.
 - Nextflow como motor de workflow científico.
 - Docker e Docker Compose para reprodutibilidade de ambiente.
-- FastAPI e Uvicorn como dependências opcionais do painel web local e da API versionada.
-- SQLAlchemy, Psycopg e Alembic para persistência PostgreSQL na Docker Platform Edition.
-- React, Vite e TypeScript para o frontend separado da Docker Platform Edition.
+- FastAPI e Uvicorn para API versionada.
+- SQLAlchemy, Psycopg e Alembic para persistência PostgreSQL.
+- React, Vite e TypeScript para frontend separado.
 - Redis 7 para fila simples do worker.
 - Nginx para reverse proxy local da plataforma.
 - Interface abstrata de provider LLM para troubleshooting operacional opcional.
 - Relatórios HTML e JSON com metadados, versões, parâmetros, logs e checksums.
 
-## Instalação
+## Instalação local da CLI
 
 Pré-requisitos mínimos:
 
@@ -72,19 +77,7 @@ Instalação em modo editável:
 python -m pip install -e .
 ```
 
-Com dependências de desenvolvimento:
-
-```bash
-python -m pip install -e ".[dev]"
-```
-
-Com dependências opcionais web:
-
-```bash
-python -m pip install -e ".[web]"
-```
-
-Com desenvolvimento e dependências web:
+Com dependências de desenvolvimento e web:
 
 ```bash
 python -m pip install -e ".[web,dev]"
@@ -92,7 +85,7 @@ python -m pip install -e ".[web,dev]"
 
 Consulte [docs/installation.md](docs/installation.md) para detalhes e solução de problemas.
 
-## Quickstart
+## Quickstart CLI
 
 ```bash
 biostack --help
@@ -126,6 +119,19 @@ docker compose down
 Acesse `http://localhost:8080` para criar projeto, executar dry-run, acompanhar runs, abrir relatórios e explicar logs com IA mock.
 
 Leia mais em [docs/docker-platform.md](docs/docker-platform.md), [docs/e2e.md](docs/e2e.md), [docs/database.md](docs/database.md) e [docs/api.md](docs/api.md).
+
+## Hardening operacional da v0.2.0
+
+- Containers Python rodam como usuário não-root.
+- Serviços principais têm healthchecks.
+- Compose usa `restart: unless-stopped`.
+- Logs Docker têm rotação básica.
+- `BIOSTACK_CORS_ORIGINS` controla CORS da API.
+- `BIOSTACK_LOG_LEVEL` controla logging de API e worker.
+- O Docker socket não é montado por padrão.
+- Segredos reais não devem ser gravados no repositório.
+
+Consulte [docs/security.md](docs/security.md), [docs/performance.md](docs/performance.md), [docs/backup-restore.md](docs/backup-restore.md) e [docs/troubleshooting-docker.md](docs/troubleshooting-docker.md).
 
 ## API FastAPI versionada
 
@@ -183,7 +189,22 @@ make lint
 make demo
 ```
 
-Os mesmos comandos são usados como referência para validar o release público.
+Validação completa de release Docker:
+
+```bash
+python -m pip install -e '.[web,dev]'
+pytest -q
+ruff check .
+cd frontend && npm install && npm run build
+cd ..
+docker compose build
+docker compose up -d
+curl -f http://localhost:8080/api/v1/health
+bash scripts/e2e-smoke.sh
+docker compose ps
+docker compose down
+grep -rI 'sk-' . || echo 'OK: sem chaves'
+```
 
 ## Público-alvo
 
@@ -195,9 +216,9 @@ O projeto é pensado inicialmente para:
 - Equipes de infraestrutura científica que precisam padronizar execuções.
 - Projetos open source que desejam documentação e auditoria desde o início.
 
-## Escopo do MVP
+## Escopo atual
 
-O MVP entrega uma CLI capaz de:
+A v0.2.0 entrega:
 
 1. Criar a estrutura de um projeto BioStack.
 2. Validar se o ambiente possui dependências essenciais.
@@ -205,25 +226,30 @@ O MVP entrega uma CLI capaz de:
 4. Capturar metadados de execução.
 5. Registrar versões, parâmetros, logs e checksums.
 6. Gerar relatório HTML e JSON.
-7. Visualizar projetos e relatórios em painel web local opcional.
-8. Explicar falhas operacionais com IA opcional limitada a troubleshooting técnico.
+7. Visualizar projetos e relatórios em painel web local e frontend Docker.
+8. Persistir projetos/runs/eventos em PostgreSQL.
+9. Processar jobs por worker Redis simples.
+10. Explicar falhas operacionais com IA opcional limitada a troubleshooting técnico.
 
 ## Roadmap
 
-- v0.1.x: estabilização do MVP, documentação e ajustes de empacotamento.
-- v0.2.0: Docker Platform Edition com backend/API, banco, fila, worker, frontend separado e reverse proxy em fases incrementais.
-- Futuro: parâmetros mais ricos, exemplos com dados públicos pequenos, integração opcional com armazenamento remoto e melhorias de auditoria.
+- v0.1.x: MVP local-first com CLI, relatórios, painel local e IA operacional mock.
+- v0.2.0: Docker Platform Edition com backend/API, banco, fila, worker, frontend separado, reverse proxy, hardening e documentação operacional.
+- Futuro: autenticação, cloud, registry de imagens, HPC/SLURM, Apptainer, observabilidade avançada, multiusuário, RBAC e institucionalização.
 
-## Fora do escopo inicial
+## Fora do escopo atual
 
-Para manter o MVP realista, o projeto não deve iniciar com:
+Para manter a plataforma realista, a v0.2.0 não inclui:
 
-- Painel web complexo.
 - Kubernetes.
-- IA interpretando resultados biológicos.
 - HPC/SLURM.
-- Multiusuário.
-- Execução simultânea de muitos workflows.
+- Apptainer.
+- Autenticação robusta.
+- Multiusuário avançado.
+- RBAC.
+- IA interpretando resultados biológicos.
+- Diagnóstico clínico.
+- Execução distribuída ou simultânea complexa de muitos workflows.
 
 ## Documentação
 
@@ -237,12 +263,16 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 - [IA operacional e troubleshooting](docs/ai-troubleshooting.md)
 - [Docker Platform Edition](docs/docker-platform.md)
 - [Validação end-to-end](docs/e2e.md)
+- [Segurança operacional](docs/security.md)
+- [Performance operacional](docs/performance.md)
+- [Backup e restore](docs/backup-restore.md)
+- [Troubleshooting Docker](docs/troubleshooting-docker.md)
 - [Audit log](docs/audit-log.md)
 - [Changelog](CHANGELOG.md)
 
 ## Estado atual
 
-Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, painel web local opcional, IA operacional opcional para troubleshooting técnico, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo. A base da v0.2.0 Docker Platform Edition está em desenvolvimento incremental com stack dockerizada integrada, preservando a CLI atual.
+Este repositório está preparando o release v0.2.0 Docker Platform Edition: CLI preservada, API, banco, fila, worker, frontend, Nginx, hardening operacional, documentação de segurança/performance/backup/troubleshooting e fluxo end-to-end obrigatório.
 
 ## Licença
 
