@@ -25,3 +25,12 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: limitar o template inicial a `rnaseq-basic`, deixando claro que ele prepara estrutura e metadados, mas ainda não executa pipeline científico de produção.
 - Decisão: proteger sobrescrita recusando diretórios existentes sem `--force`; quando `--force` é usado, o diretório do projeto é recriado integralmente.
 - Decisão: registrar templates Jinja2 como package data para manter o comando funcional também após instalação do pacote.
+
+## phase_03 — Workflow RNA-seq básico com Nextflow
+
+- Decisão: implementar `biostack run` como comando direto da CLI principal, mantendo a experiência `biostack run --dry-run` simples dentro do projeto criado por `biostack init`.
+- Decisão: construir o comando Nextflow como lista de argumentos em `biostack/core/runner.py`, evitando interpolação insegura de shell.
+- Decisão: fazer `--dry-run` criar log em `logs/<run_id>.log` e exibir o comando sem exigir Nextflow instalado, permitindo auditoria em ambientes incompletos.
+- Decisão: resolver workflows primeiro em `workflows/<nome>` dentro do projeto e depois em `workflows/<nome>` do repositório/pacote em modo editável.
+- Decisão: criar `rnaseq-basic` como pipeline demonstrativo com `FASTQC_DEMO` usando `echo`, documentando explicitamente que ainda não é análise científica validada.
+- Decisão: tratar ausência de Nextflow com mensagem amigável e sem traceback bruto para o usuário final.
