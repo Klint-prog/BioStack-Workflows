@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from biostack.api.app import create_app
 from biostack.db.models import AuditEvent, Base, Run
 from biostack.db.session import get_engine
+from biostack.worker.queue import enqueue_run_job
 
 
 class FakeRedis:
@@ -30,14 +31,11 @@ def test_api_creates_queued_run_and_enqueues_job(tmp_path, monkeypatch) -> None:
     monkeypatch.setenv("BIOSTACK_DATABASE_URL", database_url)
 
     fake_redis = FakeRedis()
-    monkeypatch.setattr(
-        "biostack.api.routes.runs.enqueue_run_job",
-        lambda **kwargs: __import__("biostack.worker.queue", fromlist=["enqueue_run_job"]).enqueue_run_job(
-            **kwargs,
-            redis_client=fake_redis,
-            queue_name="test:runs",
-        ),
-    )
+
+    def fake_enqueue_run_job(**kwargs):  # noqa: ANN003, ANN202
+        return enqueue_run_job(**kwargs, redis_client=fake_redis, queue_name="test:runs")
+
+    monkeypatch.setattr("biostack.api.routes.runs.enqueue_run_job", fake_enqueue_run_job)
 
     engine = get_engine(database_url)
     Base.metadata.create_all(engine)
