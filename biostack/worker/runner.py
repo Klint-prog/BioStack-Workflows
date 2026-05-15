@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import logging
+import os
 import time
 from pathlib import Path
 
@@ -16,9 +18,21 @@ from biostack.db.session import session_scope
 from biostack.reports.generator import load_metadata_report
 from biostack.worker.queue import RunJob, pop_run_job
 
+logger = logging.getLogger("biostack.worker")
+
+
+def configure_logging() -> None:
+    """Configure predictable container-friendly logging for the worker."""
+    log_level = os.getenv("BIOSTACK_LOG_LEVEL", "INFO").upper()
+    logging.basicConfig(
+        level=getattr(logging, log_level, logging.INFO),
+        format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+    )
+
 
 def process_run_job(job: RunJob, *, database_url: str | None = None) -> None:
     """Execute one queued run job and persist lifecycle transitions."""
+    logger.info("Processing run job %s for database_id=%s", job.job_id, job.database_id)
     with session_scope(database_url) as session:
         run = get_run_by_database_id(session, job.database_id)
         if run is None:
@@ -57,7 +71,9 @@ def process_run_job(job: RunJob, *, database_url: str | None = None) -> None:
                 metadata=json.loads(metadata.model_dump_json()),
                 status=status,
             )
+        logger.info("Completed run job %s with status=%s", job.job_id, status)
     except Exception as exc:
+        logger.exception("Failed to process run job %s", job.job_id)
         with session_scope(database_url) as session:
             run = get_run_by_database_id(session, job.database_id)
             if run is not None:
@@ -75,6 +91,7 @@ def process_run_job(job: RunJob, *, database_url: str | None = None) -> None:
 
 def run_worker_loop(*, once: bool = False, poll_timeout: int = 5) -> None:
     """Run the worker loop and process queued jobs."""
+    logger.info("BioStack worker started once=%s poll_timeout=%s", once, poll_timeout)
     while True:
         job = pop_run_job(timeout=poll_timeout)
         if job is not None:
@@ -87,6 +104,7 @@ def run_worker_loop(*, once: bool = False, poll_timeout: int = 5) -> None:
 
 def main() -> None:
     """Entrypoint used by the biostack-worker console script."""
+    configure_logging()
     run_worker_loop()
 
 
