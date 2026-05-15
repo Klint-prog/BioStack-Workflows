@@ -11,7 +11,9 @@ from biostack.db.models import AuditEvent, Base, Project, Run
 from biostack.db.session import get_engine
 
 
-def test_api_persists_project_and_run_while_keeping_reports_on_filesystem(tmp_path, monkeypatch) -> None:
+def test_api_persists_project_run_and_keeps_reports_on_filesystem(
+    tmp_path, monkeypatch
+) -> None:
     database_path = tmp_path / "api-persistence.db"
     database_url = f"sqlite:///{database_path}"
     monkeypatch.setenv("BIOSTACK_WORKSPACE", tmp_path.as_posix())
