@@ -61,12 +61,12 @@ class Project(Base):
 
     __tablename__ = "projects"
 
-    id: Mapped[uuid.UUID] = mapped_column(Guid, primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(Guid(), primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
     path: Mapped[str] = mapped_column(Text, nullable=False)
     template: Mapped[str] = mapped_column(String(120), nullable=False)
     workflow: Mapped[str] = mapped_column(String(120), nullable=False)
-    metadata_json: Mapped[dict] = mapped_column(JsonDocument, nullable=False, default=dict)
+    metadata_json: Mapped[dict] = mapped_column(JsonDocument(), nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now
@@ -81,21 +81,21 @@ class Run(Base):
     __tablename__ = "runs"
     __table_args__ = (UniqueConstraint("project_id", "run_id", name="uq_runs_project_run_id"),)
 
-    id: Mapped[uuid.UUID] = mapped_column(Guid, primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(Guid(), primary_key=True, default=uuid.uuid4)
     project_id: Mapped[uuid.UUID] = mapped_column(
-        Guid, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+        Guid(), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
     )
     run_id: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
     workflow: Mapped[str] = mapped_column(String(120), nullable=False)
     profile: Mapped[str] = mapped_column(String(120), nullable=False)
     status: Mapped[str] = mapped_column(String(80), nullable=False)
     dry_run: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    command: Mapped[list[str]] = mapped_column(JsonDocument, nullable=False, default=list)
+    command: Mapped[list[str]] = mapped_column(JsonDocument(), nullable=False, default=list)
     return_code: Mapped[int | None] = mapped_column(Integer, nullable=True)
     log_path: Mapped[str] = mapped_column(Text, nullable=False)
     report_json_path: Mapped[str] = mapped_column(Text, nullable=False)
     report_html_path: Mapped[str] = mapped_column(Text, nullable=False)
-    metadata_json: Mapped[dict] = mapped_column(JsonDocument, nullable=False, default=dict)
+    metadata_json: Mapped[dict] = mapped_column(JsonDocument(), nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now
@@ -111,13 +111,13 @@ class RunEvent(Base):
 
     __tablename__ = "run_events"
 
-    id: Mapped[uuid.UUID] = mapped_column(Guid, primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(Guid(), primary_key=True, default=uuid.uuid4)
     run_id: Mapped[uuid.UUID] = mapped_column(
-        Guid, ForeignKey("runs.id", ondelete="CASCADE"), nullable=False, index=True
+        Guid(), ForeignKey("runs.id", ondelete="CASCADE"), nullable=False, index=True
     )
     event_type: Mapped[str] = mapped_column(String(120), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
-    payload: Mapped[dict] = mapped_column(JsonDocument, nullable=False, default=dict)
+    payload: Mapped[dict] = mapped_column(JsonDocument(), nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
 
     run: Mapped[Run] = relationship(back_populates="events")
@@ -128,9 +128,9 @@ class RunFile(Base):
 
     __tablename__ = "run_files"
 
-    id: Mapped[uuid.UUID] = mapped_column(Guid, primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(Guid(), primary_key=True, default=uuid.uuid4)
     run_id: Mapped[uuid.UUID] = mapped_column(
-        Guid, ForeignKey("runs.id", ondelete="CASCADE"), nullable=False, index=True
+        Guid(), ForeignKey("runs.id", ondelete="CASCADE"), nullable=False, index=True
     )
     path: Mapped[str] = mapped_column(Text, nullable=False)
     checksum_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
@@ -145,10 +145,10 @@ class AuditEvent(Base):
 
     __tablename__ = "audit_events"
 
-    id: Mapped[uuid.UUID] = mapped_column(Guid, primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(Guid(), primary_key=True, default=uuid.uuid4)
     actor: Mapped[str] = mapped_column(String(120), nullable=False, default="system")
     action: Mapped[str] = mapped_column(String(160), nullable=False, index=True)
     entity_type: Mapped[str] = mapped_column(String(120), nullable=False)
     entity_id: Mapped[str | None] = mapped_column(String(120), nullable=True)
-    payload: Mapped[dict] = mapped_column(JsonDocument, nullable=False, default=dict)
+    payload: Mapped[dict] = mapped_column(JsonDocument(), nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
