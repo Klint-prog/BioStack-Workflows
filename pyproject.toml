@@ -34,7 +34,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest>=8.2,<9.0",
+  "ruff>=0.5,<1.0",
 ]
+web = []
 
 [project.scripts]
 biostack = "biostack.main:app"
@@ -47,6 +49,15 @@ Issues = "https://github.com/Klint-prog/BioStack-Workflows/issues"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["biostack", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = []
 
 [tool.setuptools.packages.find]
 include = ["biostack*"]
