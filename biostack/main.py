@@ -8,6 +8,7 @@ from rich.console import Console
 from biostack import __version__
 from biostack.cli.doctor import doctor_app
 from biostack.cli.init import init_project_command
+from biostack.cli.run import run_project_command
 
 app = typer.Typer(
     name="biostack",
@@ -24,6 +25,7 @@ def version() -> None:
 
 
 app.command(name="init")(init_project_command)
+app.command(name="run")(run_project_command)
 app.add_typer(doctor_app, name="doctor")
 
 

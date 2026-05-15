@@ -22,8 +22,9 @@ Projeto BioStack criado a partir do template `{{ template }}`.
 1. Coloque arquivos FASTQ ou dados brutos em `data/raw/`.
 2. Coloque genomas, índices ou anotações em `data/reference/`.
 3. Revise os parâmetros em `biostack.yml`.
-4. Aguarde a fase de execução (`biostack run`) antes de tratar este template como pipeline de produção.
+4. Execute uma simulação auditável com `biostack run --dry-run`.
+5. Execute o workflow real apenas depois de instalar Nextflow e, para o profile `docker`, Docker.
 
 ## Observação
 
-O template `{{ template }}` nesta fase inicial cria apenas a estrutura reprodutível e a configuração validada. O workflow Nextflow será implementado em fase posterior.
+O template `{{ template }}` é demonstrativo e serve para validar a camada operacional do BioStack. Ele ainda não deve ser tratado como análise científica validada para produção.
