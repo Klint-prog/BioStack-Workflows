@@ -36,7 +36,10 @@ dev = [
   "pytest>=8.2,<9.0",
   "ruff>=0.5,<1.0",
 ]
-web = []
+web = [
+  "fastapi>=0.111,<1.0",
+  "uvicorn>=0.30,<1.0",
+]
 
 [project.scripts]
 biostack = "biostack.main:app"
@@ -64,3 +67,4 @@ include = ["biostack*"]
 
 [tool.setuptools.package-data]
 "biostack.templates" = ["*.j2"]
+"biostack.web.templates" = ["*.html"]
