@@ -7,6 +7,7 @@ import shutil
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
+from subprocess import run as subprocess_run
 from typing import Literal
 from uuid import uuid4
 
@@ -66,7 +67,7 @@ def _probe_command(executable: str, args: list[str]) -> str | None:
     if shutil.which(executable) is None:
         return None
     try:
-        completed = subprocess.run(
+        completed = subprocess_run(
             [executable, *args],
             check=False,
             capture_output=True,
