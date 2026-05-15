@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "biostack-workflows"
-version = "0.1.0"
-description = "CLI open source para montar, validar e auditar workflows de bioinformática reprodutíveis."
+version = "0.2.0"
+description = "CLI e plataforma Docker open source para montar, executar e auditar workflows de bioinformática reprodutíveis."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
@@ -14,7 +14,7 @@ authors = [
 ]
 keywords = ["bioinformatics", "workflows", "nextflow", "docker", "reproducibility"]
 classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
+  "Development Status :: 3 - Alpha",
   "Environment :: Console",
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: Apache Software License",
