@@ -115,3 +115,15 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: a CLI continua usando o fluxo síncrono existente via `run_workflow`; a função `run_workflow_with_run_id` foi adicionada para o worker preservar o `run_id` já registrado no banco.
 - Decisão: o Compose adiciona Redis 7 e serviço `worker`, sem frontend React, sem Nginx e sem autenticação robusta nesta fase.
 - Observação: o worker não monta Docker socket. Se execução real com Nextflow/Docker exigir `/var/run/docker.sock`, o risco deve ser reavaliado porque isso concede controle elevado sobre o host Docker.
+
+## phase_15 — Hardening, performance e documentação
+
+- Decisão: tratar esta fase como finalização da v0.2.0 Docker Platform Edition, sem adicionar cloud, Kubernetes, autenticação complexa, HPC/SLURM, Apptainer, RBAC ou multiusuário avançado.
+- Decisão: preservar a CLI atual e atuar de forma incremental sobre Dockerfiles, Compose, logging, CORS e documentação operacional.
+- Decisão: executar containers Python (`backend`, `api`, `worker`) como usuário não-root `biostack`, mantendo `/workspace` gravável pelo serviço.
+- Decisão: aplicar hardening básico no Compose com healthchecks adicionais, `restart: unless-stopped`, `no-new-privileges`, rotação de logs e portas parametrizadas.
+- Decisão: manter o Docker socket fora dos containers e documentar o risco explicitamente em `docs/security.md`.
+- Decisão: configurar CORS por `BIOSTACK_CORS_ORIGINS`, evitando wildcard como padrão.
+- Decisão: configurar logging previsível para API e worker via `BIOSTACK_LOG_LEVEL`.
+- Decisão: documentar backup/restore, troubleshooting Docker, performance e checklist de segurança como critérios de release.
+- Observação: o ambiente de execução da IA não conseguiu clonar o repositório por falha de DNS externo; as alterações e PR foram feitas via conector GitHub. Testes que exigem Docker/local checkout devem ser validados pelo humano ou CI.
