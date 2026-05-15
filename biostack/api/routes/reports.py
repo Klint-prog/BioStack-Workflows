@@ -8,7 +8,11 @@ from fastapi import APIRouter, HTTPException
 
 from biostack.api.schemas.reports import ReportDetailResponse, ReportSummaryResponse
 from biostack.api.workspace import WorkspaceError, discover_project_configs, load_project
-from biostack.reports.generator import ReportNotFoundError, load_metadata_report, resolve_report_json
+from biostack.reports.generator import (
+    ReportNotFoundError,
+    load_metadata_report,
+    resolve_report_json,
+)
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 
