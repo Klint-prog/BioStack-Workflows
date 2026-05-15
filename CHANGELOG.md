@@ -4,6 +4,19 @@ Todas as mudanças relevantes do BioStack Workflows serão documentadas neste ar
 
 O formato segue uma organização simples por versão, com foco em rastreabilidade do MVP.
 
+## Não lançado
+
+### Adicionado
+
+- Workflow demonstrativo `variant-calling-basic` com `main.nf`, `nextflow.config` e documentação própria.
+- Suporte ao template `variant-calling-basic` em `biostack init` e na validação Pydantic de `biostack.yml`.
+- Testes cobrindo a criação de projetos com `rnaseq-basic` e `variant-calling-basic`.
+- Documentação de workflows atualizada com limites científicos e clínicos do variant calling demonstrativo.
+
+### Observações
+
+- `variant-calling-basic` é demonstrativo e não deve ser usado como pipeline clínico, diagnóstico ou científico validado.
+
 ## v0.1.0 — Release público inicial
 
 ### Adicionado
