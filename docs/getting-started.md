@@ -42,7 +42,17 @@ demo/
 
 O arquivo `demo/biostack.yml` é renderizado via Jinja2 e validado por Pydantic durante a criação do projeto. Se a validação falhar, o comando retorna erro.
 
-## 5. Proteção contra sobrescrita
+## 5. Simular a execução do workflow
+
+```bash
+cd demo
+biostack run --dry-run
+biostack run --dry-run --workflow rnaseq-basic --profile local
+```
+
+O dry-run mostra o comando Nextflow, não executa o pipeline e registra um log em `logs/<run_id>.log`.
+
+## 6. Proteção contra sobrescrita
 
 Uma segunda execução sem `--force` é recusada:
 
