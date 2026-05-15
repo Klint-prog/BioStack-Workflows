@@ -49,7 +49,9 @@ bash scripts/e2e-smoke.sh
 - `curl -f http://localhost:8969/api/v1/health` retorna HTTP 200.
 - `POST /api/v1/projects` retorna projeto criado.
 - `POST /api/v1/runs` retorna run enfileirada.
+- `GET /api/v1/runs` lista a run persistida.
 - `GET /api/v1/reports?project_name=<nome>` lista o relatório do dry-run após processamento do worker.
+- `GET /api/v1/reports/{project_name}/{run_id}` retorna o JSON do relatório.
 - `POST /api/v1/explain` retorna `provider=mock` e aviso contra uso clínico.
 
 ## Encerramento

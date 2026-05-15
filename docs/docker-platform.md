@@ -12,7 +12,7 @@ O `docker-compose.yml` define seis serviços principais e um serviço auxiliar d
 - `frontend`: build React/Vite servido por Nginx interno, ainda acessível diretamente em `http://localhost:8970` para debug.
 - `api`: FastAPI versionada em `/api/v1`, ainda acessível diretamente em `http://localhost:8971` para debug, com migrations Alembic aplicadas no startup do container.
 - `worker`: consumidor Redis que processa jobs de execução e atualiza runs persistidas.
-- `backend`: container auxiliar para comandos CLI e diagnósticos.
+- `backend`: container auxiliar para comandos CLI e diagnósticos, fora do caminho principal quando configurado por profile.
 - `postgres`: PostgreSQL 16 com volume persistente para projetos/runs/eventos.
 - `redis`: Redis 7 com AOF e volume persistente para fila/cache local.
 
@@ -100,6 +100,7 @@ Veja `.env.example` para valores seguros de exemplo. As principais variáveis op
 
 ## Documentos operacionais
 
+- [Frontend UX operacional](frontend-ux.md)
 - [Segurança operacional](security.md)
 - [Performance operacional](performance.md)
 - [Backup e restore](backup-restore.md)

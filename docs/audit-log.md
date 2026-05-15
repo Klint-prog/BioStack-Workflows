@@ -127,3 +127,15 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: configurar logging previsível para API e worker via `BIOSTACK_LOG_LEVEL`.
 - Decisão: documentar backup/restore, troubleshooting Docker, performance e checklist de segurança como critérios de release.
 - Observação: o ambiente de execução da IA não conseguiu clonar o repositório por falha de DNS externo; as alterações e PR foram feitas via conector GitHub. Testes que exigem Docker/local checkout devem ser validados pelo humano ou CI.
+
+## phase_16 — UX operacional real da plataforma
+
+- Decisão: atuar de forma incremental no frontend React/Vite, sem alterar schema de banco, autenticação, RBAC, Kubernetes, cloud, HPC/SLURM, Apptainer ou pipelines científicos pesados.
+- Decisão: usar apenas endpoints reais já existentes: `/api/v1/health`, `/api/v1/projects`, `/api/v1/runs`, `/api/v1/reports` e `/api/v1/explain`.
+- Decisão: remover rótulos antigos da UI e apresentar a interface como `BioStack Workflows · Docker Platform Edition v0.2.0`.
+- Decisão: adicionar dashboard operacional com healthcheck, totais reais, runs por status, última execução e última atualização.
+- Decisão: melhorar criação e listagem de projetos com validação visual, loading, sucesso, erro, seleção ativa e ações operacionais.
+- Decisão: adicionar polling simples no frontend a cada 8 segundos enquanto houver run `QUEUED` ou `RUNNING`.
+- Decisão: listar relatórios e abrir JSON pela API; quando `html_path` existir, exibir o caminho como metadado sem inventar endpoint estático.
+- Decisão: manter Explain no provider `mock` por padrão e exibir aviso obrigatório contra diagnóstico ou interpretação clínica.
+- Observação: o ambiente de execução da IA não conseguiu clonar o repositório por falha de DNS externo; as alterações e PR foram feitas via conector GitHub. Testes locais Docker/frontend devem ser validados pelo humano ou CI.

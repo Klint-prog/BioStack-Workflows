@@ -6,9 +6,19 @@ O formato segue uma organização simples por versão, com foco em rastreabilida
 
 ## Não lançado
 
-### Observações
+### Adicionado
 
-- Sem mudanças pendentes após a preparação do release v0.2.0 nesta fase.
+- Painel operacional da phase_16 com dashboard de métricas reais da API, healthcheck, runs por status e última atualização.
+- Fluxo visual de projetos com validação, feedback de sucesso/erro/loading, seleção ativa e ações para dry-run, runs e relatórios.
+- Aba de runs com status visual, datas, retorno, artefatos e polling automático enquanto houver `QUEUED` ou `RUNNING`.
+- Aba de relatórios com listagem real da API e visualização JSON formatada dentro da interface.
+- Aba Explain com provider `mock` por padrão e aviso obrigatório contra uso clínico.
+- Documentação `docs/frontend-ux.md` descrevendo endpoints consumidos e validação manual da UI.
+
+### Alterado
+
+- Textos da interface foram atualizados para `Docker Platform Edition v0.2.0`, removendo rótulos antigos de fase.
+- README, Docker Platform e E2E foram atualizados para refletir a UX operacional real e as portas `8969`, `8970` e `8971`.
 
 ## v0.2.0 — Docker Platform Edition
 

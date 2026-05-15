@@ -124,7 +124,19 @@ Portas externas padrão da plataforma Docker:
 - `8970`: frontend direto para debug.
 - `8971`: API direta para debug.
 
-Leia mais em [docs/docker-platform.md](docs/docker-platform.md), [docs/e2e.md](docs/e2e.md), [docs/database.md](docs/database.md) e [docs/api.md](docs/api.md).
+Portas externas padrão da plataforma Docker:
+
+- `8969`: entrada principal via Nginx.
+- `8970`: frontend direto para debug.
+- `8971`: API direta para debug.
+
+Fluxo operacional da UI:
+
+```text
+Browser -> Nginx -> Frontend React/Vite -> API FastAPI -> PostgreSQL/Redis/Worker -> Workspace compartilhado
+```
+
+Leia mais em [docs/docker-platform.md](docs/docker-platform.md), [docs/frontend-ux.md](docs/frontend-ux.md), [docs/e2e.md](docs/e2e.md), [docs/database.md](docs/database.md) e [docs/api.md](docs/api.md).
 
 ## Hardening operacional da v0.2.0
 
@@ -232,7 +244,7 @@ A v0.2.0 entrega:
 4. Capturar metadados de execução.
 5. Registrar versões, parâmetros, logs e checksums.
 6. Gerar relatório HTML e JSON.
-7. Visualizar projetos e relatórios em painel web local e frontend Docker.
+7. Visualizar projetos, runs e relatórios em painel operacional Docker.
 8. Persistir projetos/runs/eventos em PostgreSQL.
 9. Processar jobs por worker Redis simples.
 10. Explicar falhas operacionais com IA opcional limitada a troubleshooting técnico.
@@ -240,7 +252,7 @@ A v0.2.0 entrega:
 ## Roadmap
 
 - v0.1.x: MVP local-first com CLI, relatórios, painel local e IA operacional mock.
-- v0.2.0: Docker Platform Edition com backend/API, banco, fila, worker, frontend separado, reverse proxy, hardening e documentação operacional.
+- v0.2.0: Docker Platform Edition com backend/API, banco, fila, worker, frontend separado, reverse proxy, hardening, dashboard operacional e documentação.
 - Futuro: autenticação, cloud, registry de imagens, HPC/SLURM, Apptainer, observabilidade avançada, multiusuário, RBAC e institucionalização.
 
 ## Fora do escopo atual
@@ -268,6 +280,7 @@ Para manter a plataforma realista, a v0.2.0 não inclui:
 - [Persistência PostgreSQL](docs/database.md)
 - [IA operacional e troubleshooting](docs/ai-troubleshooting.md)
 - [Docker Platform Edition](docs/docker-platform.md)
+- [Frontend UX operacional](docs/frontend-ux.md)
 - [Validação end-to-end](docs/e2e.md)
 - [Segurança operacional](docs/security.md)
 - [Performance operacional](docs/performance.md)
@@ -278,7 +291,7 @@ Para manter a plataforma realista, a v0.2.0 não inclui:
 
 ## Estado atual
 
-Este repositório está preparando o release v0.2.0 Docker Platform Edition: CLI preservada, API, banco, fila, worker, frontend, Nginx, hardening operacional, documentação de segurança/performance/backup/troubleshooting e fluxo end-to-end obrigatório.
+Este repositório está preparando o release v0.2.0 Docker Platform Edition: CLI preservada, API, banco, fila, worker, frontend operacional, Nginx, hardening operacional, documentação de segurança/performance/backup/troubleshooting e fluxo end-to-end obrigatório.
 
 ## Licença
 

@@ -1,5 +1,9 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
 
+export type HealthResponse = {
+  status: string;
+};
+
 export type Project = {
   name: string;
   path: string;
@@ -59,8 +63,16 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(detail || `HTTP ${response.status}`);
+    let detail = `HTTP ${response.status}`;
+    try {
+      const payload = await response.json() as { detail?: unknown };
+      if (typeof payload.detail === 'string') detail = payload.detail;
+      else if (payload.detail) detail = JSON.stringify(payload.detail);
+    } catch {
+      const text = await response.text();
+      if (text) detail = text;
+    }
+    throw new Error(detail);
   }
 
   if (response.status === 204) return undefined as T;
@@ -68,7 +80,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  health: () => request<{ status: string }>('/health'),
+  health: () => request<HealthResponse>('/health'),
   listProjects: () => request<Project[]>('/projects'),
   createProject: (payload: { name: string; template: string; force: boolean }) =>
     request<{ status: string; project: Project }>('/projects', {
