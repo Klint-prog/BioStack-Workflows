@@ -106,3 +106,12 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: persistir `Project`, `Run`, `RunEvent`, `RunFile` e `AuditEvent`, preservando relatórios HTML/JSON e logs no filesystem.
 - Decisão: exigir migrations via Alembic antes de operar a API em Compose; testes criam schema explicitamente para isolamento.
 - Observação: a migration e os modelos usam tipos portáveis para JSON/UUID, mapeando JSONB/UUID no PostgreSQL e JSON/CHAR em SQLite.
+
+## phase_12 — Worker com Redis/fila
+
+- Decisão: usar uma fila mínima baseada em Redis lists (`LPUSH`/`BRPOP`) em vez de RQ, Dramatiq ou Celery para manter a implementação simples, auditável e sem orquestração distribuída.
+- Decisão: `POST /api/v1/runs` agora cria `Run` com status `QUEUED`, registra eventos e enfileira um job; a execução real fica a cargo do serviço `worker`.
+- Decisão: o worker atualiza o ciclo `QUEUED` → `RUNNING` → `SUCCEEDED`/`FAILED`, preservando logs e relatórios no filesystem compartilhado.
+- Decisão: a CLI continua usando o fluxo síncrono existente via `run_workflow`; a função `run_workflow_with_run_id` foi adicionada para o worker preservar o `run_id` já registrado no banco.
+- Decisão: o Compose adiciona Redis 7 e serviço `worker`, sem frontend React, sem Nginx e sem autenticação robusta nesta fase.
+- Observação: o worker não monta Docker socket. Se execução real com Nextflow/Docker exigir `/var/run/docker.sock`, o risco deve ser reavaliado porque isso concede controle elevado sobre o host Docker.
