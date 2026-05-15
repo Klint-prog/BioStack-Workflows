@@ -67,12 +67,16 @@ class Project(Base):
     template: Mapped[str] = mapped_column(String(120), nullable=False)
     workflow: Mapped[str] = mapped_column(String(120), nullable=False)
     metadata_json: Mapped[dict] = mapped_column(JsonDocument(), nullable=False, default=dict)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
+    )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now
     )
 
-    runs: Mapped[list[Run]] = relationship(back_populates="project", cascade="all, delete-orphan")
+    runs: Mapped[list[Run]] = relationship(
+        back_populates="project", cascade="all, delete-orphan"
+    )
 
 
 class Run(Base):
@@ -96,14 +100,20 @@ class Run(Base):
     report_json_path: Mapped[str] = mapped_column(Text, nullable=False)
     report_html_path: Mapped[str] = mapped_column(Text, nullable=False)
     metadata_json: Mapped[dict] = mapped_column(JsonDocument(), nullable=False, default=dict)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
+    )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now
     )
 
     project: Mapped[Project] = relationship(back_populates="runs")
-    events: Mapped[list[RunEvent]] = relationship(back_populates="run", cascade="all, delete-orphan")
-    files: Mapped[list[RunFile]] = relationship(back_populates="run", cascade="all, delete-orphan")
+    events: Mapped[list[RunEvent]] = relationship(
+        back_populates="run", cascade="all, delete-orphan"
+    )
+    files: Mapped[list[RunFile]] = relationship(
+        back_populates="run", cascade="all, delete-orphan"
+    )
 
 
 class RunEvent(Base):
@@ -118,7 +128,9 @@ class RunEvent(Base):
     event_type: Mapped[str] = mapped_column(String(120), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
     payload: Mapped[dict] = mapped_column(JsonDocument(), nullable=False, default=dict)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
+    )
 
     run: Mapped[Run] = relationship(back_populates="events")
 
@@ -135,7 +147,9 @@ class RunFile(Base):
     path: Mapped[str] = mapped_column(Text, nullable=False)
     checksum_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     role: Mapped[str] = mapped_column(String(80), nullable=False, default="input")
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
+    )
 
     run: Mapped[Run] = relationship(back_populates="files")
 
@@ -151,4 +165,6 @@ class AuditEvent(Base):
     entity_type: Mapped[str] = mapped_column(String(120), nullable=False)
     entity_id: Mapped[str | None] = mapped_column(String(120), nullable=True)
     payload: Mapped[dict] = mapped_column(JsonDocument(), nullable=False, default=dict)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
+    )
