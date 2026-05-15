@@ -10,7 +10,11 @@ from biostack.ai.prompts import CLINICAL_WARNING, build_troubleshooting_prompt
 from biostack.ai.provider import ProviderConfigurationError, get_provider
 from biostack.api.schemas.explain import ExplainRequest, ExplainResponse
 from biostack.api.workspace import WorkspaceError, load_project
-from biostack.reports.generator import ReportNotFoundError, load_metadata_report, resolve_report_json
+from biostack.reports.generator import (
+    ReportNotFoundError,
+    load_metadata_report,
+    resolve_report_json,
+)
 
 MAX_LOG_CHARS = 12_000
 router = APIRouter(prefix="/explain", tags=["explain"])
