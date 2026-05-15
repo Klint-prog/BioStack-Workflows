@@ -108,6 +108,20 @@ Para executar o workflow real, instale Nextflow e Docker e rode:
 biostack run --workflow rnaseq-basic --profile docker
 ```
 
+## Docker Platform Edition em desenvolvimento
+
+A v0.2.0 Docker Platform Edition começou pela base Docker da CLI atual. Nesta etapa existe apenas o serviço `backend` no Docker Compose, com volume persistente em `/workspace`.
+
+```bash
+docker compose build
+docker compose run --rm backend biostack --help
+docker compose run --rm backend biostack doctor
+```
+
+Banco PostgreSQL, Redis, worker, API versionada, frontend React e Nginx ainda não fazem parte desta fase e serão tratados em fases futuras.
+
+Leia mais em [docs/docker-platform.md](docs/docker-platform.md).
+
 ## Painel web local experimental
 
 O painel web é opcional, experimental, local e sem autenticação. Ele serve para revisar projetos e relatórios já gerados pela CLI, não para substituir o fluxo de terminal.
@@ -180,7 +194,7 @@ O MVP entrega uma CLI capaz de:
 ## Roadmap
 
 - v0.1.x: estabilização do MVP, documentação e ajustes de empacotamento.
-- v0.2.0: segundo template/workflow para provar extensibilidade sem duplicação.
+- v0.2.0: Docker Platform Edition com backend/API, banco, fila, worker, frontend separado e reverse proxy em fases incrementais.
 - Futuro: parâmetros mais ricos, exemplos com dados públicos pequenos, integração opcional com armazenamento remoto e melhorias de auditoria.
 
 ## Fora do escopo inicial
@@ -202,12 +216,13 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 - [Relatórios](docs/reports.md)
 - [Painel web local](docs/web-ui.md)
 - [IA operacional e troubleshooting](docs/ai-troubleshooting.md)
+- [Docker Platform Edition](docs/docker-platform.md)
 - [Audit log](docs/audit-log.md)
 - [Changelog](CHANGELOG.md)
 
 ## Estado atual
 
-Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, painel web local opcional, IA operacional opcional para troubleshooting técnico, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo.
+Este repositório está no release público v0.1.0 do MVP: CLI, init, run, report, painel web local opcional, IA operacional opcional para troubleshooting técnico, rastreabilidade básica, relatórios HTML/JSON, CI com testes e lint, documentação mínima e exemplo de demo. A base inicial da v0.2.0 Docker Platform Edition está em desenvolvimento incremental sem substituir a CLI atual.
 
 ## Licença
 
