@@ -28,28 +28,6 @@ A plataforma usa portas altas por padrão para reduzir conflitos com outros serv
 
 As portas internas dos containers continuam as mesmas: API em `8000` e frontend/Nginx em `80`.
 
-## Frontend operacional
-
-O frontend React/Vite é um painel operacional que consome dados reais da API, sem substituir respostas de projetos, runs ou relatórios por mocks.
-
-Fluxo:
-
-```text
-Browser -> Nginx -> Frontend React/Vite -> API FastAPI /api/v1 -> PostgreSQL/Redis/Worker -> Workspace compartilhado
-```
-
-A UI oferece:
-
-- dashboard com healthcheck, total de projetos, total de runs, total de relatórios e runs por status;
-- criação de projeto com validação visual, loading, sucesso e erro;
-- listagem de projetos com ações para dry-run, runs e relatórios;
-- listagem de runs com badges `QUEUED`, `RUNNING`, `SUCCEEDED` e `FAILED`;
-- polling automático enquanto houver run ativa;
-- listagem e abertura de relatórios JSON;
-- explain mock com aviso obrigatório contra diagnóstico ou interpretação clínica.
-
-Veja [Frontend UX operacional](frontend-ux.md).
-
 ## Hardening aplicado na v0.2.0
 
 - Containers Python executam como usuário não-root `biostack`.

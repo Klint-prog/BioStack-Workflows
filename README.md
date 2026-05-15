@@ -24,7 +24,6 @@ O release v0.2.0 consolida a Docker Platform Edition:
 - Redis 7 para fila local simples.
 - Worker assíncrono para processamento de runs.
 - Frontend React/Vite separado.
-- Painel operacional com dashboard, projetos, runs, relatórios e explain consumindo dados reais da API.
 - Reverse proxy Nginx em `http://localhost:8969`.
 - Healthchecks, restart policies, rotação básica de logs e containers Python não-root.
 - IA operacional opcional para troubleshooting técnico de logs e metadados, sem interpretação biológica ou clínica.
@@ -117,7 +116,13 @@ bash scripts/e2e-smoke.sh
 docker compose down
 ```
 
-Acesse `http://localhost:8969` para usar o painel operacional: dashboard com métricas reais da API, criação de projetos, dry-runs, runs com status visual, relatórios JSON e explain mock.
+Acesse `http://localhost:8969` para criar projeto, executar dry-run, acompanhar runs, abrir relatórios e explicar logs com IA mock.
+
+Portas externas padrão da plataforma Docker:
+
+- `8969`: entrada principal via Nginx.
+- `8970`: frontend direto para debug.
+- `8971`: API direta para debug.
 
 Portas externas padrão da plataforma Docker:
 

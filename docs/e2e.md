@@ -23,16 +23,11 @@ curl -f http://localhost:8969/api/v1/health
 ## Fluxo pelo navegador
 
 1. Acesse `http://localhost:8969`.
-2. Confirme que o cabeçalho exibe `BioStack Workflows · Docker Platform Edition v0.2.0` e não menciona fases antigas.
-3. Confirme que o dashboard mostra status da API, total de projetos, total de runs, total de relatórios e runs por status.
-4. Crie um projeto com template `rnaseq-basic`.
-5. Crie um projeto com template `variant-calling-basic`.
-6. Dispare um dry-run em um projeto.
-7. Abra a aba Runs e confirme o status visual da execução.
-8. Aguarde o worker atualizar a run e gerar relatório.
-9. Abra a área de relatórios e visualize o JSON.
-10. Use Explain para gerar troubleshooting com provider `mock`.
-11. Confirme que o aviso `AVISO: Não usar para diagnóstico ou interpretação clínica.` aparece.
+2. Crie um projeto com template `rnaseq-basic`.
+3. Dispare um dry-run.
+4. Aguarde o worker atualizar a run e gerar relatório.
+5. Abra a área de relatórios e visualize o JSON.
+6. Use Explain para gerar troubleshooting com provider `mock`.
 
 ## Fluxo por script
 

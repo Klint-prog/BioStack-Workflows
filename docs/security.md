@@ -43,9 +43,9 @@ Montar o Docker socket dentro de um container concede, na prática, controle ele
 
 Uso local recomendado:
 
-- `8080`: entrada principal via Nginx.
-- `8000`: API direta para debug local.
-- `5173`: frontend direto para debug local.
+- `8969`: entrada principal via Nginx.
+- `8971`: API direta para debug local.
+- `8970`: frontend direto para debug local.
 
 Para exposição fora da máquina local, antes é obrigatório adicionar pelo menos:
 
@@ -63,7 +63,7 @@ Para exposição fora da máquina local, antes é obrigatório adicionar pelo me
 A API lê `BIOSTACK_CORS_ORIGINS` como lista separada por vírgulas. O padrão local é:
 
 ```text
-http://localhost:8080,http://localhost:5173
+http://localhost:8969,http://localhost:8970
 ```
 
 Não usar `*` em ambiente compartilhado ou publicado.

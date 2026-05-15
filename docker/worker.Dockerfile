@@ -10,7 +10,7 @@ WORKDIR /app
 RUN addgroup --system biostack \
     && adduser --system --ingroup biostack --uid 10001 biostack
 
-COPY pyproject.toml README.md ./
+COPY pyproject.toml README.md alembic.ini ./
 COPY biostack ./biostack
 COPY workflows ./workflows
 COPY tests ./tests
