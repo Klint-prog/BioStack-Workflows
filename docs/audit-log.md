@@ -53,3 +53,12 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: documentar o workflow `rnaseq-basic` como demonstração operacional, não como pipeline científico validado.
 - Decisão: criar `Makefile` com targets mínimos (`install`, `test`, `lint`, `clean`, `demo`) para padronizar revisão humana e CI local.
 - Observação: há conflito textual no JSON da fase: uma tarefa pede criar/enviar tag, mas `github_push_requirement.extra_steps` diz que a IA não cria tags diretamente. Foi adotada a regra mais restritiva: a PR prepara o release e a tag `v0.1.0` fica pendente para o humano após aprovação e merge.
+
+## phase_06 — Segundo workflow: variant-calling básico
+
+- Decisão: adicionar `variant-calling-basic` como segundo workflow demonstrativo para provar reusabilidade da arquitetura sem introduzir pipeline clínico completo.
+- Decisão: manter o scaffold genérico existente em `biostack/templates/`, pois `biostack.yml.j2` e `project_README.md.j2` já recebem `template` por contexto e não exigem duplicação por workflow.
+- Decisão: ampliar a validação Pydantic com um alias `TemplateName` contendo `rnaseq-basic` e `variant-calling-basic`, mantendo `SUPPORTED_TEMPLATES` como fonte simples para validação do scaffolder.
+- Decisão: documentar explicitamente que `variant-calling-basic` não realiza alinhamento, chamada real de variantes, anotação, controle de qualidade clínico ou interpretação biológica.
+- Decisão: criar testes focados em ambos os templates para evitar regressão no `rnaseq-basic` ao adicionar novos workflows.
+- Observação: a verificação `git tag | grep v0.1.0` foi tentada via ref `v0.1.0` no GitHub e retornou `No commit found for the ref v0.1.0`; a inconsistência já havia sido prevista na phase_05 como pendência humana de tag.
