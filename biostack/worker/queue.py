@@ -15,9 +15,13 @@ DEFAULT_QUEUE_NAME = "biostack:runs"
 class QueueClient(Protocol):
     """Minimal Redis client protocol used by the queue helpers and tests."""
 
-    def lpush(self, name: str, value: str) -> Any: ...
+    def lpush(self, name: str, value: str) -> Any:
+        """Push one value into a Redis list."""
+        ...
 
-    def brpop(self, keys: str | list[str], timeout: int = 0) -> Any: ...
+    def brpop(self, keys: str | list[str], timeout: int = 0) -> Any:
+        """Blocking pop from a Redis list."""
+        ...
 
 
 @dataclass(frozen=True)
