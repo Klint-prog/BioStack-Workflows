@@ -50,3 +50,6 @@ pythonpath = ["."]
 
 [tool.setuptools.packages.find]
 include = ["biostack*"]
+
+[tool.setuptools.package-data]
+"biostack.templates" = ["*.j2"]
