@@ -1,0 +1,21 @@
+schema_version: "1.0"
+project:
+  name: "{{ project_name }}"
+  template: "{{ template }}"
+  description: "{{ description }}"
+workflow:
+  name: "{{ template }}"
+  engine: "nextflow"
+  profile: "docker"
+storage:
+  raw_data: "data/raw"
+  reference_data: "data/reference"
+  workflows: "workflows"
+  results: "results"
+  reports: "reports"
+  logs: "logs"
+  config: "config"
+reports:
+  formats:
+    - "html"
+    - "json"
