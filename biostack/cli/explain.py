@@ -13,7 +13,11 @@ from biostack.ai.prompts import CLINICAL_WARNING, build_troubleshooting_prompt
 from biostack.ai.provider import ProviderConfigurationError, get_provider
 from biostack.core.config import load_project_config
 from biostack.core.runner import ProjectConfigNotFoundError, find_project_config
-from biostack.reports.generator import ReportNotFoundError, load_metadata_report, resolve_report_json
+from biostack.reports.generator import (
+    ReportNotFoundError,
+    load_metadata_report,
+    resolve_report_json,
+)
 
 console = Console()
 MAX_LOG_CHARS = 12_000
@@ -23,7 +27,11 @@ def _read_run_context(project_dir: Path, run: str) -> tuple[str, str, str]:
     """Return run id, metadata JSON and bounded log text for troubleshooting."""
     config_path = find_project_config(project_dir)
     config = load_project_config(config_path)
-    report_path = resolve_report_json(project_dir=project_dir, run=run, reports_dir=config.storage.reports)
+    report_path = resolve_report_json(
+        project_dir=project_dir,
+        run=run,
+        reports_dir=config.storage.reports,
+    )
     metadata = load_metadata_report(report_path)
     metadata_json = json.dumps(metadata.model_dump(mode="json"), indent=2, ensure_ascii=False)
 
