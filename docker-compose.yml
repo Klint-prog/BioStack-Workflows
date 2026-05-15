@@ -2,11 +2,11 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: biostack
-      POSTGRES_USER: biostack
-      POSTGRES_PASSWORD: biostack
+      POSTGRES_DB: ${POSTGRES_DB:-biostack}
+      POSTGRES_USER: ${POSTGRES_USER:-biostack}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-biostack}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U biostack -d biostack"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-biostack} -d ${POSTGRES_DB:-biostack}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -28,15 +28,15 @@ services:
     build:
       context: .
       dockerfile: docker/backend.Dockerfile
-    image: biostack-workflows-backend:phase-13
+    image: biostack-workflows-backend:phase-14
     env_file:
       - .env.example
     environment:
       BIOSTACK_WORKSPACE: /workspace
-      BIOSTACK_DATABASE_URL: postgresql+psycopg://biostack:biostack@postgres:5432/biostack
+      BIOSTACK_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-biostack}:${POSTGRES_PASSWORD:-biostack}@postgres:5432/${POSTGRES_DB:-biostack}
       BIOSTACK_REDIS_URL: redis://redis:6379/0
     volumes:
-      - biostack_data:/workspace
+      - biostack_workspace:/workspace
     working_dir: /workspace
     depends_on:
       postgres:
@@ -48,19 +48,24 @@ services:
     build:
       context: .
       dockerfile: docker/backend.Dockerfile
-    image: biostack-workflows-backend:phase-13
+    image: biostack-workflows-backend:phase-14
     env_file:
       - .env.example
     environment:
       BIOSTACK_WORKSPACE: /workspace
-      BIOSTACK_DATABASE_URL: postgresql+psycopg://biostack:biostack@postgres:5432/biostack
+      BIOSTACK_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-biostack}:${POSTGRES_PASSWORD:-biostack}@postgres:5432/${POSTGRES_DB:-biostack}
       BIOSTACK_REDIS_URL: redis://redis:6379/0
     volumes:
-      - biostack_data:/workspace
-    working_dir: /workspace
-    command: uvicorn biostack.api.app:app --host 0.0.0.0 --port 8000
+      - biostack_workspace:/workspace
+    working_dir: /app
+    command: sh -c "alembic upgrade head && uvicorn biostack.api.app:app --host 0.0.0.0 --port 8000"
     ports:
       - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=3).read()\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
     depends_on:
       postgres:
         condition: service_healthy
@@ -71,19 +76,19 @@ services:
     build:
       context: .
       dockerfile: docker/worker.Dockerfile
-    image: biostack-workflows-worker:phase-13
+    image: biostack-workflows-worker:phase-14
     env_file:
       - .env.example
     environment:
       BIOSTACK_WORKSPACE: /workspace
-      BIOSTACK_DATABASE_URL: postgresql+psycopg://biostack:biostack@postgres:5432/biostack
+      BIOSTACK_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-biostack}:${POSTGRES_PASSWORD:-biostack}@postgres:5432/${POSTGRES_DB:-biostack}
       BIOSTACK_REDIS_URL: redis://redis:6379/0
     volumes:
-      - biostack_data:/workspace
+      - biostack_workspace:/workspace
     working_dir: /workspace
     command: biostack-worker
     depends_on:
-      postgres:
+      api:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -92,13 +97,28 @@ services:
     build:
       context: .
       dockerfile: docker/frontend.Dockerfile
-    image: biostack-workflows-frontend:phase-13
+    image: biostack-workflows-frontend:phase-14
+    expose:
+      - "80"
     ports:
       - "5173:80"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      frontend:
+        condition: service_started
+      api:
+        condition: service_healthy
 
 volumes:
-  biostack_data:
+  biostack_workspace:
   biostack_postgres_data:
   biostack_redis_data:
