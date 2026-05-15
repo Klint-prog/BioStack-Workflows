@@ -62,3 +62,11 @@ Este arquivo registra decisões, correções e inconsistências relevantes ao lo
 - Decisão: documentar explicitamente que `variant-calling-basic` não realiza alinhamento, chamada real de variantes, anotação, controle de qualidade clínico ou interpretação biológica.
 - Decisão: criar testes focados em ambos os templates para evitar regressão no `rnaseq-basic` ao adicionar novos workflows.
 - Observação: a verificação `git tag | grep v0.1.0` foi tentada via ref `v0.1.0` no GitHub e retornou `No commit found for the ref v0.1.0`; a inconsistência já havia sido prevista na phase_05 como pendência humana de tag.
+
+## phase_07 — Painel web local simples
+
+- Decisão: implementar o painel como extra opcional `web`, preservando o funcionamento da CLI sem FastAPI/Uvicorn instalados.
+- Decisão: manter a interface local, simples e sem autenticação, evitando falsa sensação de segurança e escopo multiusuário.
+- Decisão: reaproveitar relatórios HTML/JSON existentes em `reports/`, sem duplicar a camada de geração de relatórios.
+- Decisão: descobrir projetos apenas no diretório atual e subdiretórios imediatos para evitar varreduras amplas no filesystem.
+- Decisão: usar FastAPI + Jinja2 e manter HTMX fora do caminho crítico, sem React/Webpack/frontend pesado.
