@@ -56,7 +56,7 @@ line-length = 100
 src = ["biostack", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
+select = ["E", "F"]
 ignore = []
 
 [tool.setuptools.packages.find]
