@@ -80,6 +80,16 @@ biostack version
 biostack doctor
 ```
 
+Criar o primeiro projeto BioStack:
+
+```bash
+biostack init demo --template rnaseq-basic
+cd demo
+cat biostack.yml
+```
+
+O comando cria uma estrutura local padronizada com `data/raw`, `data/reference`, `workflows`, `results`, `reports`, `logs`, `config`, `biostack.yml` e `README.md`. Por segurança, uma execução repetida recusa sobrescrever o diretório existente; use `--force` apenas quando quiser recriar o projeto.
+
 Executar testes:
 
 ```bash
@@ -99,7 +109,7 @@ Para manter o MVP realista, o projeto não deve iniciar com:
 
 ## Estado atual
 
-Este repositório está na fase 01: pacote Python instalável com CLI mínima `biostack`, comandos `version` e `doctor`, testes unitários e CI básico via GitHub Actions.
+Este repositório está na fase 02: CLI instalável com `biostack init` para criação de projetos BioStack reprodutíveis a partir do template inicial `rnaseq-basic`.
 
 ## Licença
 
