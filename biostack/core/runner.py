@@ -192,11 +192,28 @@ def run_workflow(
     dry_run: bool = False,
 ) -> RunResult:
     """Build and optionally execute a configured Nextflow workflow."""
+    return run_workflow_with_run_id(
+        project_dir=project_dir,
+        workflow=workflow,
+        profile=profile,
+        dry_run=dry_run,
+    )
+
+
+def run_workflow_with_run_id(
+    *,
+    project_dir: Path | None = None,
+    workflow: str | None = None,
+    profile: str | None = None,
+    dry_run: bool = False,
+    run_id_override: str | None = None,
+) -> RunResult:
+    """Run a workflow, optionally reusing a pre-created run id for async jobs."""
     resolved_project_dir = (project_dir or Path.cwd()).resolve()
     config = load_project_config(find_project_config(resolved_project_dir))
     workflow_name = workflow or config.workflow.name
     selected_profile = profile or config.workflow.profile
-    run_id = generate_run_id()
+    run_id = run_id_override or generate_run_id()
     workflow_path = resolve_workflow_path(
         resolved_project_dir,
         workflow_name,
