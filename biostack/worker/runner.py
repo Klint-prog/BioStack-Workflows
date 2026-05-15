@@ -23,6 +23,7 @@ def process_run_job(job: RunJob, *, database_url: str | None = None) -> None:
         run = get_run_by_database_id(session, job.database_id)
         if run is None:
             raise RuntimeError(f"Run database_id={job.database_id} não encontrada.")
+        queued_run_id = run.run_id
         update_run_status(
             session,
             run=run,
@@ -37,7 +38,7 @@ def process_run_job(job: RunJob, *, database_url: str | None = None) -> None:
             workflow=job.workflow,
             profile=job.profile,
             dry_run=job.dry_run,
-            run_id_override=job.database_id,
+            run_id_override=queued_run_id,
         )
         metadata = load_metadata_report(result.report_json_path)
         status = "SUCCEEDED" if (result.return_code in (None, 0)) else "FAILED"
